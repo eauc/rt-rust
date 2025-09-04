@@ -4,16 +4,18 @@ use std::cmp;
 use std::ops;
 
 #[derive(Debug, Copy, Clone)]
-struct Color(Coordinate, Coordinate, Coordinate);
+pub struct Color(pub Coordinate, pub Coordinate, pub Coordinate);
+
+pub const BLACK: Color = Color(0.0, 0.0, 0.0);
 
 impl Color {
-    fn red(&self) -> Coordinate {
+    pub fn red(&self) -> Coordinate {
         self.0
     }
-    fn green(&self) -> Coordinate {
+    pub fn green(&self) -> Coordinate {
         self.1
     }
-    fn blue(&self) -> Coordinate {
+    pub fn blue(&self) -> Coordinate {
         self.2
     }
 }
