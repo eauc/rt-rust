@@ -1,5 +1,5 @@
-use crate::tuples::Coordinate;
-use crate::tuples::equals;
+use crate::coordinates::Coordinate;
+use crate::coordinates::equals;
 use std::cmp;
 use std::ops;
 

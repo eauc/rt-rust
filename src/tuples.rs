@@ -1,7 +1,7 @@
+use crate::coordinates::Coordinate;
+use crate::coordinates::equals;
 use std::cmp;
 use std::ops;
-
-pub type Coordinate = f32;
 
 #[derive(Debug, Copy, Clone)]
 struct Tuple(Coordinate, Coordinate, Coordinate, Coordinate);
@@ -126,12 +126,6 @@ impl ops::Div<Coordinate> for Tuple {
             self.w() / scalar,
         )
     }
-}
-
-const EPSILON: Coordinate = 0.00001;
-
-pub fn equals(a: Coordinate, b: Coordinate) -> bool {
-    (a - b).abs() < EPSILON
 }
 
 #[cfg(test)]
