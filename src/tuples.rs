@@ -1,7 +1,7 @@
 use std::cmp;
 use std::ops;
 
-type Coordinate = f32;
+pub type Coordinate = f32;
 
 #[derive(Debug, Copy, Clone)]
 struct Tuple(Coordinate, Coordinate, Coordinate, Coordinate);
@@ -130,7 +130,7 @@ impl ops::Div<Coordinate> for Tuple {
 
 const EPSILON: Coordinate = 0.00001;
 
-fn equals(a: Coordinate, b: Coordinate) -> bool {
+pub fn equals(a: Coordinate, b: Coordinate) -> bool {
     (a - b).abs() < EPSILON
 }
 
