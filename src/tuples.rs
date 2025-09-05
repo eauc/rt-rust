@@ -7,10 +7,10 @@ use std::ops;
 pub struct Tuple(pub Coordinate, pub Coordinate, pub Coordinate, pub Coordinate);
 
 impl Tuple {
-    fn point(x: Coordinate, y: Coordinate, z: Coordinate) -> Tuple {
+    pub fn point(x: Coordinate, y: Coordinate, z: Coordinate) -> Tuple {
         Tuple(x, y, z, 1.0)
     }
-    fn vector(x: Coordinate, y: Coordinate, z: Coordinate) -> Tuple {
+    pub fn vector(x: Coordinate, y: Coordinate, z: Coordinate) -> Tuple {
         Tuple(x, y, z, 0.0)
     }
     pub fn x(&self) -> Coordinate {
