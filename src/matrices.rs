@@ -12,7 +12,7 @@ impl<const M: usize> Matrix<M> {
         Matrix(data)
     }
 
-    fn identity() -> Matrix<M> {
+    pub fn identity() -> Matrix<M> {
         let mut data = [[0.0; M]; M];
         for i in 0..M {
             data[i][i] = 1.0;

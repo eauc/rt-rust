@@ -36,7 +36,7 @@ impl Tuple {
         ((self.x() * self.x()) + (self.y() * self.y()) + (self.z() * self.z())).sqrt()
     }
 
-    fn normalize(&self) -> Tuple {
+    pub fn normalize(&self) -> Tuple {
         let mag = self.magnitude();
         Tuple(
             self.x() / mag,
@@ -46,7 +46,7 @@ impl Tuple {
         )
     }
 
-    fn dot(self, other: Tuple) -> Coordinate {
+    pub fn dot(self, other: Tuple) -> Coordinate {
         self.x() * other.x() + self.y() * other.y() + self.z() * other.z() + self.w() * other.w()
     }
 

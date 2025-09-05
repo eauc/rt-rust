@@ -1,14 +1,14 @@
 use crate::colors;
 use crate::coordinates::Coordinate;
 
-struct Canvas {
+pub struct Canvas {
     width: usize,
     height: usize,
     pixels: Vec<colors::Color>,
 }
 
 impl Canvas {
-    fn new(width: usize, height: usize) -> Canvas {
+    pub fn new(width: usize, height: usize) -> Canvas {
         Canvas {
             width,
             height,
@@ -24,12 +24,12 @@ impl Canvas {
         self.pixels[self.position_to_index(x, y)]
     }
 
-    fn write_pixel(&mut self, x: usize, y: usize, color: colors::Color) {
+    pub fn write_pixel(&mut self, x: usize, y: usize, color: colors::Color) {
         let index = self.position_to_index(x, y);
         self.pixels[index] = color;
     }
 
-    fn to_ppm(&self) -> String {
+    pub fn to_ppm(&self) -> String {
         vec![self.ppm_header(), self.ppm_pixels(), String::from("")].join("\n")
     }
 
@@ -50,7 +50,7 @@ impl Canvas {
             let l = line
                 .into_iter()
                 .reduce(|acc, s| {
-                    let last_line = acc.find('\n').unwrap_or(0);
+                    let last_line = acc.rfind('\n').unwrap_or(0);
                     if acc.len() - last_line + s.len() + 1 > 70 {
                         format!("{}\n{}", acc, s)
                     } else {

@@ -1,7 +1,7 @@
 use crate::coordinates::Coordinate;
 use crate::matrices::Matrix;
 
-fn translation(x: Coordinate, y: Coordinate, z: Coordinate) -> Matrix<4> {
+pub fn translation(x: Coordinate, y: Coordinate, z: Coordinate) -> Matrix<4> {
     Matrix::new([
         [1.0, 0.0, 0.0, x],
         [0.0, 1.0, 0.0, y],
@@ -10,7 +10,7 @@ fn translation(x: Coordinate, y: Coordinate, z: Coordinate) -> Matrix<4> {
     ])
 }
 
-fn scaling(x: Coordinate, y: Coordinate, z: Coordinate) -> Matrix<4> {
+pub fn scaling(x: Coordinate, y: Coordinate, z: Coordinate) -> Matrix<4> {
     Matrix::new([
         [x, 0.0, 0.0, 0.0],
         [0.0, y, 0.0, 0.0],
