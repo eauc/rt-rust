@@ -4,7 +4,7 @@ use std::cmp;
 use std::ops;
 
 #[derive(Debug, Copy, Clone)]
-struct Tuple(Coordinate, Coordinate, Coordinate, Coordinate);
+pub struct Tuple(pub Coordinate, pub Coordinate, pub Coordinate, pub Coordinate);
 
 impl Tuple {
     fn point(x: Coordinate, y: Coordinate, z: Coordinate) -> Tuple {
@@ -13,16 +13,16 @@ impl Tuple {
     fn vector(x: Coordinate, y: Coordinate, z: Coordinate) -> Tuple {
         Tuple(x, y, z, 0.0)
     }
-    fn x(&self) -> Coordinate {
+    pub fn x(&self) -> Coordinate {
         self.0
     }
-    fn y(&self) -> Coordinate {
+    pub fn y(&self) -> Coordinate {
         self.1
     }
-    fn z(&self) -> Coordinate {
+    pub fn z(&self) -> Coordinate {
         self.2
     }
-    fn w(&self) -> Coordinate {
+    pub fn w(&self) -> Coordinate {
         self.3
     }
     fn is_point(&self) -> bool {
