@@ -20,7 +20,7 @@ impl<const M: usize> Matrix<M> {
         Matrix(data)
     }
 
-    fn transpose(&self) -> Matrix<M> {
+    pub fn transpose(&self) -> Matrix<M> {
         let mut data = [[0.0; M]; M];
         for i in 0..M {
             for j in 0..M {

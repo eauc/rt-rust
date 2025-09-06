@@ -19,7 +19,7 @@ pub fn scaling(x: Coordinate, y: Coordinate, z: Coordinate) -> Matrix<4> {
     ])
 }
 
-fn rotation_x(r: Coordinate) -> Matrix<4> {
+pub fn rotation_x(r: Coordinate) -> Matrix<4> {
     Matrix::new([
         [1.0, 0.0, 0.0, 0.0],
         [0.0, r.cos(), -r.sin(), 0.0],
@@ -28,7 +28,7 @@ fn rotation_x(r: Coordinate) -> Matrix<4> {
     ])
 }
 
-fn rotation_y(r: Coordinate) -> Matrix<4> {
+pub fn rotation_y(r: Coordinate) -> Matrix<4> {
     Matrix::new([
         [r.cos(), 0.0, r.sin(), 0.0],
         [0.0, 1.0, 0.0, 0.0],
@@ -37,7 +37,7 @@ fn rotation_y(r: Coordinate) -> Matrix<4> {
     ])
 }
 
-fn rotation_z(r: Coordinate) -> Matrix<4> {
+pub fn rotation_z(r: Coordinate) -> Matrix<4> {
     Matrix::new([
         [r.cos(), -r.sin(), 0.0, 0.0],
         [r.sin(), r.cos(), 0.0, 0.0],
@@ -46,7 +46,7 @@ fn rotation_z(r: Coordinate) -> Matrix<4> {
     ])
 }
 
-fn shearing(
+pub fn shearing(
     xy: Coordinate,
     xz: Coordinate,
     yx: Coordinate,

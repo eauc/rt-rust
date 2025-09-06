@@ -13,7 +13,7 @@ impl Ray {
         Ray { origin, direction }
     }
 
-    fn position(&self, f: Coordinate) -> Tuple {
+    pub fn position(&self, f: Coordinate) -> Tuple {
         self.origin + self.direction * f
     }
 

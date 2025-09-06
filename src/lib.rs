@@ -2,6 +2,8 @@ pub mod canvas;
 pub mod colors;
 mod coordinates;
 pub mod intersections;
+pub mod lights;
+mod materials;
 mod matrices;
 pub mod rays;
 pub mod spheres;
