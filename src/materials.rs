@@ -8,9 +8,9 @@ use crate::tuples::Tuple;
 pub struct Material {
     pub color: Color,
     pub ambient: Coordinate,
-    diffuse: Coordinate,
-    specular: Coordinate,
-    shininess: Coordinate,
+    pub diffuse: Coordinate,
+    pub specular: Coordinate,
+    pub shininess: Coordinate,
 }
 
 impl Material {

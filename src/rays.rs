@@ -1,7 +1,7 @@
 use crate::coordinates::Coordinate;
 use crate::matrices::Matrix;
-use crate::tuples::Tuple;
 use crate::transformations;
+use crate::tuples::Tuple;
 
 pub struct Ray {
     pub origin: Tuple,

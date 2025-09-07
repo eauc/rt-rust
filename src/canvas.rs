@@ -20,7 +20,7 @@ impl Canvas {
         y * self.width + x
     }
 
-    fn pixel_at(&self, x: usize, y: usize) -> colors::Color {
+    pub fn pixel_at(&self, x: usize, y: usize) -> colors::Color {
         self.pixels[self.position_to_index(x, y)]
     }
 

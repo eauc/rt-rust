@@ -8,7 +8,7 @@ use std::cmp;
 #[derive(Debug, cmp::PartialEq)]
 pub struct Sphere {
     pub material: Material,
-    transform: Matrix<4>,
+    pub transform: Matrix<4>,
 }
 
 impl Sphere {

@@ -54,7 +54,7 @@ impl Tuple {
         self.x() * other.x() + self.y() * other.y() + self.z() * other.z() + self.w() * other.w()
     }
 
-    fn cross(self, other: Tuple) -> Tuple {
+    pub fn cross(self, other: Tuple) -> Tuple {
         Self::vector(
             self.y() * other.z() - self.z() * other.y(),
             self.z() * other.x() - self.x() * other.z(),
