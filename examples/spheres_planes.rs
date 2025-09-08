@@ -15,9 +15,9 @@ fn main() {
     wall_material.color = Color::new(1.0, 0.9, 0.9);
     wall_material.specular = 0.0;
     let mut floor = Plane::new(Matrix::identity());
-    floor.material = wall_material;
+    floor.material = wall_material.clone();
     let mut left_wall = Plane::new(rotation_z(PI / 2.0) * translation(0.0, -5.0, 0.0));
-    left_wall.material = wall_material;
+    left_wall.material = wall_material.clone();
 
     let mut middle = Sphere::new(translation(-0.5, 1.0, 0.5));
     middle.material.color = Color::new(0.1, 1.0, 0.5);

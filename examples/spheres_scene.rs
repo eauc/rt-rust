@@ -13,21 +13,21 @@ fn main() {
     wall_material.color = Color::new(1.0, 0.9, 0.9);
     wall_material.specular = 0.0;
     let mut floor = Sphere::new(scaling(10.0, 0.01, 10.0));
-    floor.material = wall_material;
+    floor.material = wall_material.clone();
     let mut left_wall = Sphere::new(
         translation(0.0, 0.0, 5.0)
             * rotation_y(-PI / 4.0)
             * rotation_x(PI / 2.0)
             * scaling(10.0, 0.01, 10.0),
     );
-    left_wall.material = wall_material;
+    left_wall.material = wall_material.clone();
     let mut right_wall = Sphere::new(
         translation(0.0, 0.0, 5.0)
             * rotation_y(PI / 4.0)
             * rotation_x(PI / 2.0)
             * scaling(10.0, 0.01, 10.0),
     );
-    right_wall.material = wall_material;
+    right_wall.material = wall_material.clone();
 
     let mut middle = Sphere::new(translation(-0.5, 1.0, 0.5));
     middle.material.color = Color::new(0.1, 1.0, 0.5);

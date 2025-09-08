@@ -7,6 +7,7 @@ pub mod lights;
 pub mod materials;
 pub mod matrices;
 pub mod planes;
+pub mod patterns;
 pub mod rays;
 pub mod shapes;
 pub mod spheres;

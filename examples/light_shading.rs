@@ -31,7 +31,7 @@ fn main() {
                 let eyev = -ray.direction;
                 let color = sphere
                     .material
-                    .lighting(&light, hit_point, eyev, normalv, false);
+                    .lighting(&sphere, &light, hit_point, eyev, normalv, false);
                 canvas.write_pixel(x, y, color);
             }
         }

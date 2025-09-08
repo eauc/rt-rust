@@ -203,8 +203,8 @@ mod tests {
     fn a_sphere_may_be_assigned_a_material() {
         let mut s = Sphere::default();
         let mut m = Material::default();
-        m.ambient = 1.0;
-        s.material = m;
+        m.ambient = 1.23456;
+        s.material = m.clone();
         assert_eq!(s.material, m);
     }
 }

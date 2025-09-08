@@ -44,6 +44,7 @@ impl<'a> World<'a> {
     fn shade_hit(&self, hit: &Intersection, comps: &IntersectionComputations) -> Color {
         let is_shadowed = self.is_shadowed(comps.over_point);
         hit.object.material().lighting(
+            hit.object,
             &self.light,
             comps.over_point,
             comps.eyev,
