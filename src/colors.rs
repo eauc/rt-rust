@@ -1,14 +1,16 @@
-use crate::coordinates::Coordinate;
-use crate::coordinates::equals;
-use std::cmp;
-use std::ops;
+use crate::coordinates::{Coordinate, equals};
+use std::{cmp, ops};
 
 #[derive(Debug, Copy, Clone)]
-pub struct Color(pub Coordinate, pub Coordinate, pub Coordinate);
+pub struct Color(Coordinate, Coordinate, Coordinate);
 
 pub const BLACK: Color = Color(0.0, 0.0, 0.0);
+pub const WHITE: Color = Color(1.0, 1.0, 1.0);
 
 impl Color {
+    pub fn new(red: Coordinate, green: Coordinate, blue: Coordinate) -> Color {
+        Color(red, green, blue)
+    }
     pub fn red(&self) -> Coordinate {
         self.0
     }
@@ -88,7 +90,6 @@ mod tests {
         assert_eq!(c.blue(), 1.7);
     }
 
-    //  Scenario: Adding colors
     #[test]
     fn adding_colors() {
         let c1 = Color(0.9, 0.6, 0.75);

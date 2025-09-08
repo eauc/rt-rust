@@ -1,12 +1,13 @@
-use crate::coordinates::Coordinate;
-use crate::coordinates::equals;
-use std::cmp;
-use std::ops;
+use crate::coordinates::{Coordinate, equals};
+use std::{cmp, ops};
 
 #[derive(Debug, Copy, Clone)]
-pub struct Tuple(pub Coordinate, pub Coordinate, pub Coordinate, pub Coordinate);
+pub struct Tuple(Coordinate, Coordinate, Coordinate, Coordinate);
 
 impl Tuple {
+    pub fn new(x: Coordinate, y: Coordinate, z: Coordinate, w: Coordinate) -> Tuple {
+        Tuple(x, y, z, w)
+    }
     pub fn point(x: Coordinate, y: Coordinate, z: Coordinate) -> Tuple {
         Tuple(x, y, z, 1.0)
     }
@@ -28,12 +29,6 @@ impl Tuple {
     pub fn to_vector(&mut self) -> &Tuple {
         self.3 = 0.0;
         self
-    }
-    fn is_point(&self) -> bool {
-        self.w() == 1.0
-    }
-    fn is_vector(&self) -> bool {
-        self.w() == 0.0
     }
 
     fn magnitude(&self) -> Coordinate {
@@ -147,8 +142,6 @@ mod tests {
         assert_eq!(a.y(), -4.2);
         assert_eq!(a.z(), 3.1);
         assert_eq!(a.w(), 1.0);
-        assert_eq!(a.is_point(), true);
-        assert_eq!(a.is_vector(), false);
     }
 
     #[test]
@@ -158,8 +151,6 @@ mod tests {
         assert_eq!(a.y(), -4.2);
         assert_eq!(a.z(), 3.1);
         assert_eq!(a.w(), 0.0);
-        assert_eq!(a.is_point(), false);
-        assert_eq!(a.is_vector(), true);
     }
 
     #[test]

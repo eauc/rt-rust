@@ -5,7 +5,7 @@ pub mod intersections;
 pub mod lights;
 pub mod cameras;
 pub mod materials;
-mod matrices;
+pub mod matrices;
 pub mod rays;
 pub mod spheres;
 pub mod transformations;

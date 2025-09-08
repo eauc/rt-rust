@@ -87,7 +87,7 @@ mod tests {
     #[test]
     fn writing_pixels_to_a_canvas() {
         let mut c = Canvas::new(10, 20);
-        let red = colors::Color(1.0, 0.0, 0.0);
+        let red = colors::Color::new(1.0, 0.0, 0.0);
         c.write_pixel(2, 3, red);
         assert_eq!(c.pixel_at(2, 3), red);
     }
@@ -104,9 +104,9 @@ mod tests {
     #[test]
     fn constructing_the_ppm_pixel_data() {
         let mut c = Canvas::new(5, 3);
-        let c1 = colors::Color(1.5, 0.0, 0.0);
-        let c2 = colors::Color(0.0, 0.5, 0.0);
-        let c3 = colors::Color(-0.5, 0.0, 1.0);
+        let c1 = colors::Color::new(1.5, 0.0, 0.0);
+        let c2 = colors::Color::new(0.0, 0.5, 0.0);
+        let c3 = colors::Color::new(-0.5, 0.0, 1.0);
         c.write_pixel(0, 0, c1);
         c.write_pixel(2, 1, c2);
         c.write_pixel(4, 2, c3);
@@ -127,7 +127,7 @@ mod tests {
         let mut c = Canvas::new(10, 2);
         for x in 0..10 {
             for y in 0..2 {
-                c.write_pixel(x, y, colors::Color(1.0, 0.8, 0.6));
+                c.write_pixel(x, y, colors::Color::new(1.0, 0.8, 0.6));
             }
         }
         let ppm = c.to_ppm();

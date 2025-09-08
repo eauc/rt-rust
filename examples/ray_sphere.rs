@@ -13,8 +13,8 @@ fn main() {
     let pixel_size = wall_size / canvas_pixel as f32;
     let half = wall_size / 2.0;
     let mut canvas = Canvas::new(canvas_pixel, canvas_pixel);
-    let red = Color(1.0, 0.0, 0.0);
-    let sphere = Sphere::new();
+    let red = Color::new(1.0, 0.0, 0.0);
+    let sphere = Sphere::default();
     for y in 0..canvas_pixel {
         let world_y = half - pixel_size * y as f32;
         for x in 0..canvas_pixel {

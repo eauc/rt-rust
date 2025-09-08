@@ -1,8 +1,6 @@
-use crate::coordinates::Coordinate;
-use crate::coordinates::equals;
+use crate::coordinates::{Coordinate, equals};
 use crate::tuples::Tuple;
-use std::cmp;
-use std::ops;
+use std::{cmp, ops};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Matrix<const M: usize>([[Coordinate; M]; M]);
@@ -20,7 +18,7 @@ impl<const M: usize> Matrix<M> {
         Matrix(data)
     }
 
-    pub fn transpose(&self) -> Matrix<M> {
+    pub fn transpose(self) -> Matrix<M> {
         let mut data = [[0.0; M]; M];
         for i in 0..M {
             for j in 0..M {
@@ -32,7 +30,7 @@ impl<const M: usize> Matrix<M> {
 }
 
 impl Matrix<2> {
-    fn determinant(&self) -> Coordinate {
+    fn determinant(self) -> Coordinate {
         self.0[0][0] * self.0[1][1] - self.0[0][1] * self.0[1][0]
     }
 }
@@ -54,11 +52,11 @@ impl Matrix<3> {
         return Matrix(data);
     }
 
-    fn minor(&self, row: usize, column: usize) -> Coordinate {
+    fn minor(self, row: usize, column: usize) -> Coordinate {
         self.submatrix(row, column).determinant()
     }
 
-    fn cofactor(&self, row: usize, column: usize) -> Coordinate {
+    fn cofactor(self, row: usize, column: usize) -> Coordinate {
         let minor = self.minor(row, column);
         if (row + column) % 2 == 0 {
             minor
@@ -67,7 +65,7 @@ impl Matrix<3> {
         }
     }
 
-    fn determinant(&self) -> Coordinate {
+    fn determinant(self) -> Coordinate {
         self.0[0][0] * self.cofactor(0, 0)
             + self.0[0][1] * self.cofactor(0, 1)
             + self.0[0][2] * self.cofactor(0, 2)
@@ -91,11 +89,11 @@ impl Matrix<4> {
         return Matrix(data);
     }
 
-    fn minor(&self, row: usize, column: usize) -> Coordinate {
+    fn minor(self, row: usize, column: usize) -> Coordinate {
         self.submatrix(row, column).determinant()
     }
 
-    fn cofactor(&self, row: usize, column: usize) -> Coordinate {
+    fn cofactor(self, row: usize, column: usize) -> Coordinate {
         let minor = self.minor(row, column);
         if (row + column) % 2 == 0 {
             minor
@@ -104,18 +102,18 @@ impl Matrix<4> {
         }
     }
 
-    fn determinant(&self) -> Coordinate {
+    fn determinant(self) -> Coordinate {
         self.0[0][0] * self.cofactor(0, 0)
             + self.0[0][1] * self.cofactor(0, 1)
             + self.0[0][2] * self.cofactor(0, 2)
             + self.0[0][3] * self.cofactor(0, 3)
     }
 
-    fn is_invertible(&self) -> bool {
+    fn is_invertible(self) -> bool {
         !equals(self.determinant(), 0.0)
     }
 
-    pub fn inverse(&self) -> Matrix<4> {
+    pub fn inverse(self) -> Matrix<4> {
         if !self.is_invertible() {
             panic!("Matrix is not invertible");
         }
@@ -177,7 +175,7 @@ impl ops::Mul<Tuple> for Matrix<4> {
     type Output = Tuple;
 
     fn mul(self, other: Tuple) -> Tuple {
-        Tuple(
+        Tuple::new(
             self[(0, 0)] * other.x()
                 + self[(0, 1)] * other.y()
                 + self[(0, 2)] * other.z()
@@ -304,8 +302,8 @@ mod tests {
             [8.0, 6.0, 4.0, 1.0],
             [0.0, 0.0, 0.0, 1.0],
         ]);
-        let b = Tuple(1.0, 2.0, 3.0, 1.0);
-        assert_eq!(a * b, Tuple(18.0, 24.0, 33.0, 1.0));
+        let b = Tuple::new(1.0, 2.0, 3.0, 1.0);
+        assert_eq!(a * b, Tuple::new(18.0, 24.0, 33.0, 1.0));
     }
 
     #[test]
@@ -322,7 +320,7 @@ mod tests {
     #[test]
     fn multiplying_the_identity_matrix_by_a_tuple() {
         let a = Matrix::identity();
-        let b = Tuple(1.0, 2.0, 3.0, 4.0);
+        let b = Tuple::new(1.0, 2.0, 3.0, 4.0);
         assert_eq!(a * b, b);
     }
 

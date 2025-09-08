@@ -11,12 +11,16 @@ pub struct Camera {
     half_width: Coordinate,
     half_height: Coordinate,
     pixel_size: Coordinate,
-    field_of_view: Coordinate,
-    pub transform: Matrix<4>,
+    transform_inv: Matrix<4>,
 }
 
 impl Camera {
-    pub fn new(hsize: usize, vsize: usize, field_of_view: Coordinate) -> Camera {
+    pub fn new(
+        hsize: usize,
+        vsize: usize,
+        field_of_view: Coordinate,
+        transform: Matrix<4>,
+    ) -> Camera {
         let half_view = (field_of_view / 2.0).tan();
         let aspect = hsize as Coordinate / vsize as Coordinate;
         let (half_width, half_height) = if aspect >= 1.0 {
@@ -30,8 +34,7 @@ impl Camera {
             half_width,
             half_height,
             pixel_size: half_width * 2.0 / hsize as Coordinate,
-            field_of_view,
-            transform: Matrix::identity(),
+            transform_inv: transform.inverse(),
         }
     }
 
@@ -40,9 +43,8 @@ impl Camera {
         let y_offset = (y as Coordinate + 0.5) * self.pixel_size;
         let world_x = self.half_width - x_offset;
         let world_y = self.half_height - y_offset;
-        let transform_inv = self.transform.inverse();
-        let pixel = transform_inv * Tuple::point(world_x, world_y, -1.0);
-        let origin = transform_inv * Tuple::point(0.0, 0.0, 0.0);
+        let pixel = self.transform_inv * Tuple::point(world_x, world_y, -1.0);
+        let origin = self.transform_inv * Tuple::point(0.0, 0.0, 0.0);
         let direction = (pixel - origin).normalize();
         return Ray::new(origin, direction);
     }
@@ -64,7 +66,8 @@ impl Camera {
 mod tests {
     use super::*;
     use crate::colors::Color;
-    use crate::transformations;
+    use crate::transformations::{rotation_y, translation, view_transform};
+    use crate::worlds::tests::default_world;
     use std::f32::consts::PI;
 
     #[test]
@@ -72,28 +75,26 @@ mod tests {
         let hsize = 160;
         let vsize = 120;
         let field_of_view = PI / 2.0;
-        let c = Camera::new(hsize, vsize, field_of_view);
+        let c = Camera::new(hsize, vsize, field_of_view, Matrix::identity());
         assert_eq!(c.hsize, 160);
         assert_eq!(c.vsize, 120);
-        assert_eq!(c.field_of_view, PI / 2.0);
-        assert_eq!(c.transform, Matrix::identity());
     }
 
     #[test]
     fn the_pixel_size_for_a_horizontal_canvas() {
-        let c = Camera::new(200, 125, PI / 2.0);
+        let c = Camera::new(200, 125, PI / 2.0, Matrix::identity());
         assert_eq!(c.pixel_size, 0.01);
     }
 
     #[test]
     fn the_pixel_size_for_a_vertical_canvas() {
-        let c = Camera::new(125, 200, PI / 2.0);
+        let c = Camera::new(125, 200, PI / 2.0, Matrix::identity());
         assert_eq!(c.pixel_size, 0.01);
     }
 
     #[test]
     fn constructing_a_ray_through_the_center_of_the_canvas() {
-        let c = Camera::new(201, 101, PI / 2.0);
+        let c = Camera::new(201, 101, PI / 2.0, Matrix::identity());
         let r = c.ray_for_pixel(100, 50);
         assert_eq!(r.origin, Tuple::point(0.0, 0.0, 0.0));
         assert_eq!(r.direction, Tuple::vector(0.0, 0.0, -1.0));
@@ -101,7 +102,7 @@ mod tests {
 
     #[test]
     fn constructing_a_ray_through_a_corner_of_the_canvas() {
-        let c = Camera::new(201, 101, PI / 2.0);
+        let c = Camera::new(201, 101, PI / 2.0, Matrix::identity());
         let r = c.ray_for_pixel(0, 0);
         assert_eq!(r.origin, Tuple::point(0.0, 0.0, 0.0));
         assert_eq!(r.direction, Tuple::vector(0.66519, 0.33259, -0.66851));
@@ -109,9 +110,12 @@ mod tests {
 
     #[test]
     fn constructing_a_ray_when_the_camera_is_transformed() {
-        let mut c = Camera::new(201, 101, PI / 2.0);
-        c.transform =
-            transformations::rotation_y(PI / 4.0) * transformations::translation(0.0, -2.0, 5.0);
+        let c = Camera::new(
+            201,
+            101,
+            PI / 2.0,
+            rotation_y(PI / 4.0) * translation(0.0, -2.0, 5.0),
+        );
         let r = c.ray_for_pixel(100, 50);
         assert_eq!(r.origin, Tuple::point(0.0, 2.0, -5.0));
         assert_eq!(
@@ -122,13 +126,12 @@ mod tests {
 
     #[test]
     fn rendering_a_world_with_a_camera() {
-        let w = World::default();
+        let w = default_world();
         let from = Tuple::point(0.0, 0.0, -5.0);
         let to = Tuple::point(0.0, 0.0, 0.0);
         let up = Tuple::vector(0.0, 1.0, 0.0);
-        let mut c = Camera::new(11, 11, PI / 2.0);
-        c.transform = transformations::view_transform(from, to, up);
+        let c = Camera::new(11, 11, PI / 2.0, view_transform(from, to, up));
         let image = c.render(&w);
-        assert_eq!(image.pixel_at(5, 5), Color(0.38066, 0.47583, 0.2855));
+        assert_eq!(image.pixel_at(5, 5), Color::new(0.38066, 0.47583, 0.2855));
     }
 }
