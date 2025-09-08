@@ -31,7 +31,7 @@ impl Tuple {
         self
     }
 
-    fn magnitude(&self) -> Coordinate {
+    pub fn magnitude(&self) -> Coordinate {
         ((self.x() * self.x()) + (self.y() * self.y()) + (self.z() * self.z())).sqrt()
     }
 

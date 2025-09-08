@@ -28,7 +28,7 @@ fn main() {
                 let hit_point = ray.position(hit.t);
                 let normalv = hit.object.normal_at(hit_point);
                 let eyev = -ray.direction;
-                let color = sphere.material.lighting(&light, hit_point, eyev, normalv);
+                let color = sphere.material.lighting(&light, hit_point, eyev, normalv, false);
                 canvas.write_pixel(x, y, color);
             }
         }
