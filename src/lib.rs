@@ -1,12 +1,13 @@
+pub mod cameras;
 pub mod canvas;
 pub mod colors;
 mod coordinates;
 pub mod intersections;
 pub mod lights;
-pub mod cameras;
 pub mod materials;
 pub mod matrices;
 pub mod rays;
+pub mod shapes;
 pub mod spheres;
 pub mod transformations;
 pub mod tuples;

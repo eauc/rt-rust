@@ -2,7 +2,7 @@ use crate::coordinates::Coordinate;
 use crate::matrices::Matrix;
 use crate::tuples::Tuple;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Ray {
     pub origin: Tuple,
     pub direction: Tuple,

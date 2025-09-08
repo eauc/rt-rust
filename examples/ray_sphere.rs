@@ -1,9 +1,10 @@
 use rt_rust::canvas::Canvas;
 use rt_rust::colors::Color;
+use rt_rust::intersections;
 use rt_rust::rays::Ray;
+use rt_rust::shapes::intersect;
 use rt_rust::spheres::Sphere;
 use rt_rust::tuples::Tuple;
-use rt_rust::intersections;
 
 fn main() {
     let ray_origin = Tuple::point(0.0, 0.0, -5.0);
@@ -21,7 +22,7 @@ fn main() {
             let world_x = -half + pixel_size * x as f32;
             let position = Tuple::point(world_x, world_y, wall_z);
             let ray = Ray::new(ray_origin, (position - ray_origin).normalize());
-            let xs = sphere.intersect(&ray);
+            let xs = intersect(&sphere, &ray);
             if let Some(_) = intersections::hit(&xs) {
                 canvas.write_pixel(x, y, red);
             }

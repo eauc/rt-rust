@@ -3,6 +3,7 @@ use rt_rust::colors::Color;
 use rt_rust::intersections;
 use rt_rust::lights::PointLight;
 use rt_rust::rays::Ray;
+use rt_rust::shapes::{intersect, normal_at};
 use rt_rust::spheres::Sphere;
 use rt_rust::tuples::Tuple;
 
@@ -23,12 +24,14 @@ fn main() {
             let world_x = -half + pixel_size * x as f32;
             let position = Tuple::point(world_x, world_y, wall_z);
             let ray = Ray::new(ray_origin, (position - ray_origin).normalize());
-            let xs = sphere.intersect(&ray);
+            let xs = intersect(&sphere, &ray);
             if let Some(hit) = intersections::hit(&xs) {
                 let hit_point = ray.position(hit.t);
-                let normalv = hit.object.normal_at(hit_point);
+                let normalv = normal_at(hit.object, hit_point);
                 let eyev = -ray.direction;
-                let color = sphere.material.lighting(&light, hit_point, eyev, normalv, false);
+                let color = sphere
+                    .material
+                    .lighting(&light, hit_point, eyev, normalv, false);
                 canvas.write_pixel(x, y, color);
             }
         }

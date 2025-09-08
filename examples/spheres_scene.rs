@@ -47,7 +47,7 @@ fn main() {
     let light = PointLight::new(Tuple::point(-10.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
     let world = World::new(
         light,
-        vec![floor, left_wall, right_wall, middle, right, left],
+        vec![&floor, &left_wall, &right_wall, &middle, &right, &left],
     );
 
     let camera = Camera::new(
