@@ -20,18 +20,18 @@ pub fn color_at_object(pattern: &dyn Pattern, object: &dyn Shape, world_point: T
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use crate::spheres::Sphere;
     use crate::transformations::{scaling, translation};
     use crate::tuples::Tuple;
 
-    struct TestPattern {
+    pub struct TestPattern {
         transform_inverse: Matrix<4>,
     }
 
     impl TestPattern {
-        fn new(transform: Matrix<4>) -> TestPattern {
+        pub fn new(transform: Matrix<4>) -> TestPattern {
             TestPattern {
                 transform_inverse: transform.inverse(),
             }

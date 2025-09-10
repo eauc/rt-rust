@@ -27,6 +27,17 @@ impl Sphere {
     pub fn default() -> Sphere {
         Sphere::new(Matrix::identity())
     }
+
+    pub fn glass(transform: Matrix<4>) -> Sphere {
+        let mut s = Sphere::new(transform);
+        s.material.ambient = 0.0;
+        s.material.diffuse = 0.588235;
+        s.material.specular = 0.9;
+        s.material.transparency = 1.0;
+        s.material.reflective = 0.08;
+        s.material.refractive_index = 1.5;
+        s
+    }
 }
 
 impl Shape for Sphere {
@@ -93,7 +104,10 @@ mod tests {
         let r = Ray::new(Tuple::point(0.0, 0.0, 0.0), Tuple::vector(0.0, 0.0, 1.0));
         let s = Sphere::default();
         let xs = intersect(&s, &r);
-        assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<f32>>(), vec![-1.0, 1.0]);
+        assert_eq!(
+            xs.iter().map(|x| x.t).collect::<Vec<f32>>(),
+            vec![-1.0, 1.0]
+        );
     }
 
     #[test]
@@ -101,7 +115,10 @@ mod tests {
         let r = Ray::new(Tuple::point(0.0, 0.0, 5.0), Tuple::vector(0.0, 0.0, 1.0));
         let s = Sphere::default();
         let xs = intersect(&s, &r);
-        assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<f32>>(), vec![-6.0, -4.0]);
+        assert_eq!(
+            xs.iter().map(|x| x.t).collect::<Vec<f32>>(),
+            vec![-6.0, -4.0]
+        );
     }
 
     #[test]
@@ -206,5 +223,12 @@ mod tests {
         m.ambient = 1.23456;
         s.material = m.clone();
         assert_eq!(s.material, m);
+    }
+
+    #[test]
+    fn a_glassy_sphere() {
+        let s = Sphere::glass(Matrix::identity());
+        assert_eq!(s.material.transparency, 1.0);
+        assert_eq!(s.material.refractive_index, 1.5);
     }
 }
