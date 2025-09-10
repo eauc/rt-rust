@@ -14,6 +14,7 @@ pub struct IntersectionComputations {
     pub eyev: Tuple,
     pub normalv: Tuple,
     pub inside: bool,
+    pub reflectv: Tuple,
 }
 
 impl<'a> Intersection<'a> {
@@ -28,12 +29,14 @@ impl<'a> Intersection<'a> {
         let inside = normalv.dot(eyev) < 0.0;
         let normalv = if inside { -normalv } else { normalv };
         let over_point = point + normalv * EPSILON;
+        let reflectv = ray.direction.reflect(normalv);
         IntersectionComputations {
             point,
             over_point,
             eyev,
             normalv,
             inside,
+            reflectv,
         }
     }
 }
@@ -47,6 +50,7 @@ pub fn hit<'a>(xs: &'a Vec<Intersection<'a>>) -> Option<&'a Intersection<'a>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::planes::Plane;
     use crate::spheres::Sphere;
     use crate::transformations::translation;
 
@@ -139,5 +143,19 @@ mod tests {
         let comps = i.prepare_computations(&r);
         assert!(comps.over_point.z() < -EPSILON / 2.0);
         assert!(comps.point.z() > comps.over_point.z());
+    }
+
+    #[test]
+    fn precomputing_the_reflection_vector() {
+        let shape = Plane::default();
+        let position = Tuple::point(0.0, 1.0, 0.0);
+        let eyev = Tuple::vector(0.0, -(2.0_f32).sqrt() / 2.0, (2.0_f32).sqrt() / 2.0);
+        let r = Ray::new(position, eyev);
+        let i = Intersection::new(1.0, &shape);
+        let comps = i.prepare_computations(&r);
+        assert_eq!(
+            comps.reflectv,
+            Tuple::vector(0.0, 2.0_f32.sqrt() / 2.0, 2.0_f32.sqrt() / 2.0)
+        );
     }
 }

@@ -13,8 +13,9 @@ pub struct Material {
     pub color: Color,
     pub ambient: Coordinate,
     pub diffuse: Coordinate,
-    pub specular: Coordinate,
+    pub reflective: Coordinate,
     pub shininess: Coordinate,
+    pub specular: Coordinate,
 }
 
 impl Material {
@@ -24,8 +25,9 @@ impl Material {
             color: WHITE,
             ambient: 0.1,
             diffuse: 0.9,
-            specular: 0.9,
+            reflective: 0.0,
             shininess: 200.0,
+            specular: 0.9,
         }
     }
 
@@ -101,8 +103,9 @@ mod tests {
         assert_eq!(m.color, Color::new(1.0, 1.0, 1.0));
         assert_eq!(m.ambient, 0.1);
         assert_eq!(m.diffuse, 0.9);
-        assert_eq!(m.specular, 0.9);
+        assert_eq!(m.reflective, 0.0);
         assert_eq!(m.shininess, 200.0);
+        assert_eq!(m.specular, 0.9);
     }
 
     #[test]

@@ -21,6 +21,9 @@ impl Plane {
             transform_inverse_transpose: transform_inverse.transpose(),
         }
     }
+    pub fn default() -> Plane {
+        Plane::new(Matrix::identity())
+    }
 }
 
 impl Shape for Plane {

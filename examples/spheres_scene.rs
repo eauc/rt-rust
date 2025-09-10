@@ -61,7 +61,7 @@ fn main() {
         ),
     );
 
-    let image = camera.render(&world);
+    let image = camera.render(&world, 0);
     let ppm = image.to_ppm();
     std::fs::write("examples/spheres_scene.ppm", ppm).unwrap();
 }

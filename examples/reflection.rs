@@ -20,12 +20,14 @@ fn main() {
         Color::new(0.1, 1.0, 0.1),
         Color::new(0.1, 0.1, 1.0),
     )));
+    floor.material.reflective = 0.5;
 
     let mut gradient = GradientPattern::new(Color::new(1.0, 0.0, 0.0), Color::new(0.0, 0.0, 1.0));
     gradient
         .set_transform(translation(-1.0, 0.0, 0.0) * rotation_y(PI / 4.0) * scaling(2.0, 1.0, 1.0));
     let mut middle = Sphere::new(translation(0.0, 1.5, 0.0));
     middle.material.pattern = Some(Arc::new(gradient));
+    middle.material.reflective = 0.5;
 
     let mut stripes = StripePattern::new(Color::new(1.0, 1.0, 0.0), Color::new(0.2, 0.6, 1.0));
     stripes.set_transform(scaling(0.5, 1.0, 1.0));
@@ -50,7 +52,7 @@ fn main() {
         ),
     );
 
-    let image = camera.render(&world, 0);
+    let image = camera.render(&world, 5);
     let ppm = image.to_ppm();
-    std::fs::write("examples/patterns.ppm", ppm).unwrap();
+    std::fs::write("examples/reflection.ppm", ppm).unwrap();
 }
