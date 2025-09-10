@@ -4,7 +4,7 @@ use rt_rust::intersections;
 use rt_rust::lights::PointLight;
 use rt_rust::rays::Ray;
 use rt_rust::shapes::{intersect, normal_at};
-use rt_rust::spheres::Sphere;
+use rt_rust::shapes::spheres::Sphere;
 use rt_rust::tuples::Tuple;
 
 fn main() {

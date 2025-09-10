@@ -3,7 +3,7 @@ use rt_rust::colors::Color;
 use rt_rust::intersections;
 use rt_rust::rays::Ray;
 use rt_rust::shapes::intersect;
-use rt_rust::spheres::Sphere;
+use rt_rust::shapes::spheres::Sphere;
 use rt_rust::tuples::Tuple;
 
 fn main() {

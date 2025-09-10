@@ -115,8 +115,8 @@ pub mod tests {
     use crate::colors::BLACK;
     use crate::matrices::Matrix;
     use crate::patterns::tests::TestPattern;
-    use crate::planes::Plane;
-    use crate::spheres::Sphere;
+    use crate::shapes::planes::Plane;
+    use crate::shapes::spheres::Sphere;
     use crate::transformations::{scaling, translation};
     use std::sync::Arc;
 

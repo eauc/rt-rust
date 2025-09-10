@@ -103,8 +103,8 @@ pub fn schlick(comps: &IntersectionComputations) -> Coordinate {
 mod tests {
     use super::*;
     use crate::matrices::Matrix;
-    use crate::planes::Plane;
-    use crate::spheres::Sphere;
+    use crate::shapes::planes::Plane;
+    use crate::shapes::spheres::Sphere;
     use crate::transformations::{scaling, translation};
 
     #[test]

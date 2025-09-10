@@ -4,6 +4,10 @@ use crate::matrices::Matrix;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
+pub mod cubes;
+pub mod planes;
+pub mod spheres;
+
 pub trait Shape {
     fn material(&self) -> &Material;
     fn transform_inverse(&self) -> Matrix<4>;

@@ -2,7 +2,7 @@ use rt_rust::cameras::Camera;
 use rt_rust::colors::Color;
 use rt_rust::lights::PointLight;
 use rt_rust::materials::Material;
-use rt_rust::spheres::Sphere;
+use rt_rust::shapes::spheres::Sphere;
 use rt_rust::transformations::{rotation_x, rotation_y, scaling, translation, view_transform};
 use rt_rust::tuples::Tuple;
 use rt_rust::worlds::World;

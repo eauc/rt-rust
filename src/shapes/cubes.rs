@@ -1,0 +1,182 @@
+use crate::coordinates::{Coordinate, EPSILON};
+use crate::intersections::Intersection;
+use crate::materials::Material;
+use crate::matrices::Matrix;
+use crate::rays::Ray;
+use crate::shapes::Shape;
+use crate::tuples::Tuple;
+
+pub struct Cube {
+    pub material: Material,
+    transform_inverse: Matrix<4>,
+    transform_inverse_transpose: Matrix<4>,
+}
+
+impl Cube {
+    pub fn new(transform: Matrix<4>) -> Cube {
+        let transform_inverse = transform.inverse();
+        Cube {
+            material: Material::default(),
+            transform_inverse,
+            transform_inverse_transpose: transform_inverse.transpose(),
+        }
+    }
+}
+
+impl Shape for Cube {
+    fn material(&self) -> &Material {
+        &self.material
+    }
+    fn transform_inverse(&self) -> Matrix<4> {
+        self.transform_inverse
+    }
+    fn transform_inverse_transpose(&self) -> Matrix<4> {
+        self.transform_inverse_transpose
+    }
+    fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Intersection<'a>> {
+        let (xtmin, xtmax) = check_axis(ray.origin.x(), ray.direction.x());
+        let (ytmin, ytmax) = check_axis(ray.origin.y(), ray.direction.y());
+        let (ztmin, ztmax) = check_axis(ray.origin.z(), ray.direction.z());
+        let tmin = xtmin.max(ytmin).max(ztmin);
+        let tmax = xtmax.min(ytmax).min(ztmax);
+        if tmin > tmax {
+            return vec![];
+        }
+        vec![Intersection::new(tmin, self), Intersection::new(tmax, self)]
+    }
+    fn local_normal_at(&self, local_point: Tuple) -> Tuple {
+        let maxc = local_point
+            .x()
+            .abs()
+            .max(local_point.y().abs())
+            .max(local_point.z().abs());
+        match maxc {
+            val if val == local_point.x().abs() => Tuple::vector(local_point.x(), 0.0, 0.0),
+            val if val == local_point.y().abs() => Tuple::vector(0.0, local_point.y(), 0.0),
+            val if val == local_point.z().abs() => Tuple::vector(0.0, 0.0, local_point.z()),
+            _ => panic!(),
+        }
+    }
+}
+
+fn check_axis(origin: Coordinate, direction: Coordinate) -> (Coordinate, Coordinate) {
+    let tmin_numerator = -1.0 - origin;
+    let tmax_numerator = 1.0 - origin;
+
+    let (tmin, tmax) = if direction.abs() >= EPSILON {
+        (tmin_numerator / direction, tmax_numerator / direction)
+    } else {
+        (
+            tmin_numerator * Coordinate::INFINITY,
+            tmax_numerator * Coordinate::INFINITY,
+        )
+    };
+    if tmin > tmax {
+        (tmax, tmin)
+    } else {
+        (tmin, tmax)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::rays::Ray;
+    use crate::tuples::Tuple;
+
+    #[test]
+    fn a_ray_intersects_a_cube() {
+        let c = Cube::new(Matrix::identity());
+        let origins = vec![
+            Tuple::point(5.0, 0.5, 0.0),
+            Tuple::point(-5.0, 0.5, 0.0),
+            Tuple::point(0.5, 5.0, 0.0),
+            Tuple::point(0.5, -5.0, 0.0),
+            Tuple::point(0.5, 0.0, 5.0),
+            Tuple::point(0.5, 0.0, -5.0),
+            Tuple::point(0.0, 0.5, 0.0),
+        ];
+        let directions = vec![
+            Tuple::vector(-1.0, 0.0, 0.0),
+            Tuple::vector(1.0, 0.0, 0.0),
+            Tuple::vector(0.0, -1.0, 0.0),
+            Tuple::vector(0.0, 1.0, 0.0),
+            Tuple::vector(0.0, 0.0, -1.0),
+            Tuple::vector(0.0, 0.0, 1.0),
+            Tuple::vector(0.0, 0.0, 1.0),
+        ];
+        let results = vec![
+            vec![4.0, 6.0],
+            vec![4.0, 6.0],
+            vec![4.0, 6.0],
+            vec![4.0, 6.0],
+            vec![4.0, 6.0],
+            vec![4.0, 6.0],
+            vec![-1.0, 1.0],
+        ];
+        for i in 0..origins.len() {
+            let r = Ray::new(origins[i], directions[i]);
+            let xs = c.local_intersect(&r);
+            // println!("{:?} {:?}", origins[i], directions[i]);
+            assert_eq!(
+                xs.iter().map(|x| x.t).collect::<Vec<Coordinate>>(),
+                results[i]
+            );
+        }
+    }
+
+    #[test]
+    fn a_ray_misses_a_cube() {
+        let c = Cube::new(Matrix::identity());
+        let origins = vec![
+            Tuple::point(-2.0, 0.0, 0.0),
+            Tuple::point(0.0, -2.0, 0.0),
+            Tuple::point(0.0, 0.0, -2.0),
+            Tuple::point(2.0, 0.0, 2.0),
+            Tuple::point(0.0, 2.0, 2.0),
+            Tuple::point(2.0, 2.0, 0.0),
+        ];
+        let directions = vec![
+            Tuple::vector(0.2673, 0.5345, 0.8018),
+            Tuple::vector(0.8018, 0.2673, 0.5345),
+            Tuple::vector(0.5345, 0.8018, 0.2673),
+            Tuple::vector(0.0, 0.0, -1.0),
+            Tuple::vector(0.0, -1.0, 0.0),
+            Tuple::vector(-1.0, 0.0, 0.0),
+        ];
+        for i in 0..origins.len() {
+            let r = Ray::new(origins[i], directions[i]);
+            let xs = c.local_intersect(&r);
+            assert_eq!(xs.len(), 0);
+        }
+    }
+
+    #[test]
+    fn the_normal_on_the_surface_of_a_cube() {
+        let c = Cube::new(Matrix::identity());
+        let points = vec![
+            Tuple::point(1.0, 0.5, -0.8),
+            Tuple::point(-1.0, -0.2, 0.9),
+            Tuple::point(-0.4, 1.0, -0.1),
+            Tuple::point(0.3, -1.0, -0.7),
+            Tuple::point(-0.6, 0.3, 1.0),
+            Tuple::point(0.4, 0.4, -1.0),
+            Tuple::point(1.0, 1.0, 1.0),
+            Tuple::point(-1.0, -1.0, -1.0),
+        ];
+        let normals = vec![
+            Tuple::vector(1.0, 0.0, 0.0),
+            Tuple::vector(-1.0, 0.0, 0.0),
+            Tuple::vector(0.0, 1.0, 0.0),
+            Tuple::vector(0.0, -1.0, 0.0),
+            Tuple::vector(0.0, 0.0, 1.0),
+            Tuple::vector(0.0, 0.0, -1.0),
+            Tuple::vector(1.0, 0.0, 0.0),
+            Tuple::vector(-1.0, 0.0, 0.0),
+        ];
+        for i in 0..points.len() {
+            let n = c.local_normal_at(points[i]);
+            assert_eq!(n, normals[i]);
+        }
+    }
+}

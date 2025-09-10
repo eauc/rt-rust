@@ -99,7 +99,7 @@ impl fmt::Debug for Material {
 mod tests {
     use super::*;
     use crate::patterns::stripes::StripePattern;
-    use crate::spheres::Sphere;
+    use crate::shapes::spheres::Sphere;
 
     #[test]
     fn the_default_material() {

@@ -22,7 +22,7 @@ pub fn color_at_object(pattern: &dyn Pattern, object: &dyn Shape, world_point: T
 #[cfg(test)]
 pub mod tests {
     use super::*;
-    use crate::spheres::Sphere;
+    use crate::shapes::spheres::Sphere;
     use crate::transformations::{scaling, translation};
     use crate::tuples::Tuple;
 

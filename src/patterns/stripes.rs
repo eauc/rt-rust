@@ -43,7 +43,7 @@ mod tests {
     use super::*;
     use crate::colors::{BLACK, WHITE};
     use crate::patterns::color_at_object;
-    use crate::spheres::Sphere;
+    use crate::shapes::spheres::Sphere;
     use crate::transformations::{scaling, translation};
 
     #[test]
