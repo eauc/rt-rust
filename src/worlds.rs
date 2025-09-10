@@ -1,5 +1,5 @@
 use crate::colors::{BLACK, Color};
-use crate::intersections::{self, Intersection, IntersectionComputations};
+use crate::intersections::{self, Intersection, IntersectionComputations, schlick};
 use crate::lights::PointLight;
 use crate::rays::Ray;
 use crate::shapes::{Shape, intersect};
@@ -89,7 +89,13 @@ impl<'a> World<'a> {
         );
         let reflected = self.reflected_color(hit, comps, depth);
         let refracted = self.refracted_color(hit, comps, depth);
-        surface + reflected + refracted
+        let material = hit.object.material();
+        if material.reflective > 0.0 && material.transparency > 0.0 {
+            let reflectance = schlick(comps);
+            surface + reflected * reflectance + refracted * (1.0 - reflectance)
+        } else {
+            surface + reflected + refracted
+        }
     }
 
     pub fn color_at(&self, ray: &Ray, depth: u32) -> Color {
@@ -411,5 +417,29 @@ pub mod tests {
         let comps = xs[0].prepare_computations(&r, &xs);
         let c = w.shade_hit(&xs[0], &comps, 5);
         assert_eq!(c, Color::new(0.9364251, 0.6864251, 0.6864251));
+    }
+
+    #[test]
+    fn shade_hit_with_a_reflective_transparent_material() {
+        let (s1, s2) = default_world_objects();
+        let mut floor = Plane::new(translation(0.0, -1.0, 0.0));
+        floor.material.reflective = 0.5;
+        floor.material.transparency = 0.5;
+        floor.material.refractive_index = 1.5;
+        let mut ball = Sphere::new(translation(0.0, -3.5, -0.5));
+        ball.material.color = Color::new(1.0, 0.0, 0.0);
+        ball.material.ambient = 0.5;
+        let mut w = default_world(&s1, &s2);
+        w.objects.push(&floor);
+        w.objects.push(&ball);
+        let r = Ray::new(
+            Tuple::point(0.0, 0.0, -3.0),
+            Tuple::vector(0.0, -2.0_f32.sqrt() / 2.0, 2.0_f32.sqrt() / 2.0),
+        );
+        let i = Intersection::new(2.0_f32.sqrt(), &floor);
+        let xs = vec![i];
+        let comps = xs[0].prepare_computations(&r, &xs);
+        let c = w.shade_hit(&xs[0], &comps, 5);
+        assert_eq!(c, Color::new(0.93391, 0.696432, 0.6924281));
     }
 }

@@ -84,9 +84,25 @@ pub fn hit<'a>(xs: &'a Vec<Intersection<'a>>) -> Option<&'a Intersection<'a>> {
         .min_by(|i1, i2| i1.t.total_cmp(&i2.t))
 }
 
+pub fn schlick(comps: &IntersectionComputations) -> Coordinate {
+    let mut cos = comps.eyev.dot(comps.normalv);
+    if comps.n1 > comps.n2 {
+        let n = comps.n1 / comps.n2;
+        let sin2_t = n.powi(2) * (1.0 - cos.powi(2));
+        if sin2_t > 1.0 {
+            return 1.0;
+        }
+        let cos_t = (1.0 - sin2_t).sqrt();
+        cos = cos_t;
+    }
+    let r0 = ((comps.n1 - comps.n2) / (comps.n1 + comps.n2)).powi(2);
+    r0 + (1.0 - r0) * (1.0 - cos).powi(5)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::matrices::Matrix;
     use crate::planes::Plane;
     use crate::spheres::Sphere;
     use crate::transformations::{scaling, translation};
@@ -198,7 +214,7 @@ mod tests {
 
     #[test]
     fn the_under_point_is_offset_below_the_surface() {
-        let r = Ray::new(Tuple::point(0.0,0.0,-5.0), Tuple::vector(0.0, 0.0, 1.0));
+        let r = Ray::new(Tuple::point(0.0, 0.0, -5.0), Tuple::vector(0.0, 0.0, 1.0));
         let shape = Sphere::glass(translation(0.0, 0.0, 1.0));
         let i = Intersection::new(5.0, &shape);
         let xs = vec![i];
@@ -238,5 +254,44 @@ mod tests {
                 (1.5, 1.0),
             ]
         )
+    }
+
+    #[test]
+    fn the_schlick_approximation_under_total_internal_reflection() {
+        let shape = Sphere::glass(Matrix::identity());
+        let r = Ray::new(
+            Tuple::point(0.0, 0.0, 2.0_f32.sqrt() / 2.0),
+            Tuple::vector(0.0, 1.0, 0.0),
+        );
+        let xs = vec![
+            Intersection::new(-(2.0_f32).sqrt() / 2.0, &shape),
+            Intersection::new((2.0_f32).sqrt() / 2.0, &shape),
+        ];
+        let comps = xs[1].prepare_computations(&r, &xs);
+        let reflectance = schlick(&comps);
+        assert_eq!(reflectance, 1.0);
+    }
+
+    #[test]
+    fn the_schlick_approximation_with_a_perpendicular_viewing_angle() {
+        let shape = Sphere::glass(Matrix::identity());
+        let r = Ray::new(Tuple::point(0.0, 0.0, 0.0), Tuple::vector(0.0, 1.0, 0.0));
+        let xs = vec![
+            Intersection::new(-1.0, &shape),
+            Intersection::new(1.0, &shape),
+        ];
+        let comps = xs[1].prepare_computations(&r, &xs);
+        let reflectance = schlick(&comps);
+        assert_eq!(reflectance, 0.040000003);
+    }
+
+    #[test]
+    fn the_schlick_approximation_with_small_angle_and_n2_gt_n1() {
+        let shape = Sphere::glass(Matrix::identity());
+        let r = Ray::new(Tuple::point(0.0, 0.99, -2.0), Tuple::vector(0.0, 0.0, 1.0));
+        let xs = vec![Intersection::new(1.8589, &shape)];
+        let comps = xs[0].prepare_computations(&r, &xs);
+        let reflectance = schlick(&comps);
+        assert_eq!(reflectance, 0.48873067);
     }
 }

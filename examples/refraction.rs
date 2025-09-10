@@ -17,16 +17,17 @@ fn main() {
 
     let mut glass = Sphere::glass(Matrix::identity());
     glass.material.ambient = 0.0;
-    glass.material.diffuse = 0.588235;
+    glass.material.diffuse = 0.2;
     glass.material.specular = 0.9;
+    glass.material.shininess = 300.0;
     glass.material.refractive_index = 1.5;
-    glass.material.transparency = 1.0;
-    glass.material.reflective = 0.08;
+    glass.material.transparency = 0.9;
+    glass.material.reflective = 0.9;
     let mut air = Sphere::new(scaling(0.6, 0.6, 0.6));
     air.material.ambient = 0.0;
     air.material.diffuse = 0.0;
     air.material.specular = 0.0;
-    air.material.reflective = 0.0;
+    air.material.reflective = 0.9;
     air.material.transparency = 1.0;
     air.material.refractive_index = 1.0;
 
