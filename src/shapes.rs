@@ -4,6 +4,7 @@ use crate::matrices::Matrix;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
+pub mod cones;
 pub mod cubes;
 pub mod cylinders;
 pub mod planes;
