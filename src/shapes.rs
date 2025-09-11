@@ -5,6 +5,7 @@ use crate::rays::Ray;
 use crate::tuples::Tuple;
 
 pub mod cubes;
+pub mod cylinders;
 pub mod planes;
 pub mod spheres;
 
