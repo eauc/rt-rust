@@ -1,12 +1,10 @@
 use crate::colors::Color;
-use crate::matrices::Matrix;
-use crate::patterns::Pattern;
 use crate::tuples::Tuple;
 
+#[derive(Debug, Clone)]
 pub struct RingPattern {
     a: Color,
     b: Color,
-    transform_inverse: Matrix<4>,
 }
 
 impl RingPattern {
@@ -14,21 +12,10 @@ impl RingPattern {
         RingPattern {
             a,
             b,
-            transform_inverse: Matrix::identity(),
         }
     }
 
-    pub fn set_transform(&mut self, transform: Matrix<4>) {
-        self.transform_inverse = transform.inverse();
-    }
-}
-
-impl Pattern for RingPattern {
-    fn transform_inverse(&self) -> Matrix<4> {
-        self.transform_inverse
-    }
-
-    fn color_at(&self, point: Tuple) -> Color {
+    pub fn color_at(&self, point: Tuple) -> Color {
         let r = (point.x().powi(2) + point.z().powi(2)).sqrt().floor() as i32;
         if r % 2 == 0 {
             self.a

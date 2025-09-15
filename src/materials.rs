@@ -1,15 +1,14 @@
 use crate::colors::{BLACK, Color, WHITE};
 use crate::coordinates::Coordinate;
 use crate::lights::PointLight;
-use crate::patterns::{Pattern, color_at_object};
+use crate::patterns::{Pattern};
 use crate::shapes::Shape;
 use crate::tuples::Tuple;
 use std::fmt;
-use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct Material {
-    pub pattern: Option<Arc<dyn Pattern>>,
+    pub pattern: Option<Pattern>,
     pub color: Color,
     pub ambient: Coordinate,
     pub diffuse: Coordinate,
@@ -45,7 +44,7 @@ impl Material {
         in_shadow: bool,
     ) -> Color {
         let color = if let Some(pattern) = &self.pattern {
-            color_at_object(pattern.as_ref(), object, position)
+            pattern.color_at_object(object, position)
         } else {
             self.color
         };
@@ -98,7 +97,6 @@ impl fmt::Debug for Material {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::patterns::stripes::StripePattern;
     use crate::shapes::spheres::Sphere;
 
     #[test]
@@ -191,7 +189,7 @@ mod tests {
     #[test]
     fn lighting_with_a_pattern_applied() {
         let mut m = Material::default();
-        m.pattern = Some(Arc::new(StripePattern::new(WHITE, BLACK)));
+        m.pattern = Some(Pattern::new_stripe(WHITE, BLACK));
         m.ambient = 1.0;
         m.diffuse = 0.0;
         m.specular = 0.0;

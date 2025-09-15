@@ -3,20 +3,83 @@ use crate::matrices::Matrix;
 use crate::shapes::Shape;
 use crate::tuples::Tuple;
 
-pub mod checkers;
-pub mod gradients;
-pub mod rings;
-pub mod stripes;
+mod checkers;
+mod gradients;
+mod rings;
+mod stripes;
 
-pub trait Pattern {
-    fn transform_inverse(&self) -> Matrix<4>;
-    fn color_at(&self, point: Tuple) -> Color;
+#[derive(Debug, Clone)]
+pub struct Pattern {
+    pattern: Patterns,
+    transform_inverse: Matrix<4>,
 }
 
-pub fn color_at_object(pattern: &dyn Pattern, object: &dyn Shape, world_point: Tuple) -> Color {
-    let object_point = object.transform_inverse() * world_point;
-    let pattern_point = pattern.transform_inverse() * object_point;
-    pattern.color_at(pattern_point)
+impl Pattern {
+    fn new(pattern: Patterns) -> Pattern {
+        Pattern {
+            pattern,
+            transform_inverse: Matrix::identity(),
+        }
+    }
+
+    pub fn new_checker(a: Color, b: Color) -> Pattern {
+        Pattern::new(Patterns::Checker(checkers::CheckerPattern::new(a, b)))
+    }
+    pub fn new_gradient(a: Color, b: Color) -> Pattern {
+        Pattern::new(Patterns::Gradient(gradients::GradientPattern::new(a, b)))
+    }
+    pub fn new_ring(a: Color, b: Color) -> Pattern {
+        Pattern::new(Patterns::Ring(rings::RingPattern::new(a, b)))
+    }
+    pub fn new_stripe(a: Color, b: Color) -> Pattern {
+        Pattern::new(Patterns::Stripe(stripes::StripePattern::new(a, b)))
+    }
+    pub fn new_test() -> Pattern {
+        Pattern::new(Patterns::Test(TestPattern))
+    }
+
+    pub fn with_transform(self, transform: Matrix<4>) -> Pattern {
+        Pattern {
+            transform_inverse: transform.inverse(),
+            ..self
+        }
+    }
+
+    pub fn color_at_object(&self, object: &dyn Shape, world_point: Tuple) -> Color {
+        let object_point = object.transform_inverse() * world_point;
+        let pattern_point = self.transform_inverse * object_point;
+        self.pattern.color_at(pattern_point)
+    }
+}
+
+#[derive(Debug, Clone)]
+enum Patterns {
+    Checker(checkers::CheckerPattern),
+    Gradient(gradients::GradientPattern),
+    Ring(rings::RingPattern),
+    Stripe(stripes::StripePattern),
+    Test(TestPattern),
+}
+
+impl Patterns {
+    fn color_at(&self, point: Tuple) -> Color {
+        match *self {
+            Patterns::Checker(ref pattern) => pattern.color_at(point),
+            Patterns::Stripe(ref pattern) => pattern.color_at(point),
+            Patterns::Gradient(ref pattern) => pattern.color_at(point),
+            Patterns::Ring(ref pattern) => pattern.color_at(point),
+            Patterns::Test(ref pattern) => pattern.color_at(point),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct TestPattern;
+
+impl TestPattern {
+    fn color_at(&self, point: Tuple) -> Color {
+        Color::new(point.x(), point.y(), point.z())
+    }
 }
 
 #[cfg(test)]
@@ -26,63 +89,29 @@ pub mod tests {
     use crate::transformations::{scaling, translation};
     use crate::tuples::Tuple;
 
-    pub struct TestPattern {
-        transform_inverse: Matrix<4>,
-    }
-
-    impl TestPattern {
-        pub fn new(transform: Matrix<4>) -> TestPattern {
-            TestPattern {
-                transform_inverse: transform.inverse(),
-            }
-        }
-    }
-
-    impl Pattern for TestPattern {
-        fn transform_inverse(&self) -> Matrix<4> {
-            self.transform_inverse
-        }
-        fn color_at(&self, point: Tuple) -> Color {
-            Color::new(point.x(), point.y(), point.z())
-        }
-    }
-
-    #[test]
-    fn the_default_pattern_transformation_is_the_identity_matrix() {
-        let pattern = TestPattern::new(Matrix::identity());
-        assert_eq!(pattern.transform_inverse(), Matrix::identity());
-    }
-
-    #[test]
-    fn assigning_a_transformation() {
-        let pattern = TestPattern::new(translation(1.0, 2.0, 3.0));
-        assert_eq!(
-            pattern.transform_inverse(),
-            translation(1.0, 2.0, 3.0).inverse()
-        );
-    }
-
     #[test]
     fn a_pattern_with_an_object_transformation() {
         let object = Sphere::new(scaling(2.0, 2.0, 2.0));
-        let pattern = TestPattern::new(Matrix::identity());
-        let c = color_at_object(&pattern, &object, Tuple::point(2.0, 3.0, 4.0));
+        let pattern = Pattern::new(Patterns::Test(TestPattern));
+        let c = pattern.color_at_object(&object, Tuple::point(2.0, 3.0, 4.0));
         assert_eq!(c, Color::new(1.0, 1.5, 2.0));
     }
 
     #[test]
     fn a_pattern_with_a_pattern_transformation() {
         let object = Sphere::default();
-        let pattern = TestPattern::new(scaling(2.0, 2.0, 2.0));
-        let c = color_at_object(&pattern, &object, Tuple::point(2.0, 3.0, 4.0));
+        let pattern =
+            Pattern::new(Patterns::Test(TestPattern)).with_transform(scaling(2.0, 2.0, 2.0));
+        let c = pattern.color_at_object(&object, Tuple::point(2.0, 3.0, 4.0));
         assert_eq!(c, Color::new(1.0, 1.5, 2.0));
     }
 
     #[test]
     fn a_pattern_with_both_an_object_and_a_pattern_transformation() {
         let object = Sphere::new(scaling(2.0, 2.0, 2.0));
-        let pattern = TestPattern::new(translation(0.5, 1.0, 1.5));
-        let c = color_at_object(&pattern, &object, Tuple::point(2.5, 3.0, 3.5));
+        let pattern =
+            Pattern::new(Patterns::Test(TestPattern)).with_transform(translation(0.5, 1.0, 1.5));
+        let c = pattern.color_at_object(&object, Tuple::point(2.5, 3.0, 3.5));
         assert_eq!(c, Color::new(0.75, 0.5, 0.25));
     }
 }

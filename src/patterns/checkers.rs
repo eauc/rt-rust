@@ -1,12 +1,10 @@
 use crate::colors::Color;
-use crate::matrices::Matrix;
-use crate::patterns::Pattern;
 use crate::tuples::Tuple;
 
+#[derive(Debug, Clone)]
 pub struct CheckerPattern {
     a: Color,
     b: Color,
-    transform_inverse: Matrix<4>,
 }
 
 impl CheckerPattern {
@@ -14,20 +12,10 @@ impl CheckerPattern {
         CheckerPattern {
             a,
             b,
-            transform_inverse: Matrix::identity(),
         }
     }
 
-    pub fn set_transform(&mut self, transform: Matrix<4>) {
-        self.transform_inverse = transform.inverse();
-    }
-}
-
-impl Pattern for CheckerPattern {
-    fn transform_inverse(&self) -> Matrix<4> {
-        self.transform_inverse
-    }
-    fn color_at(&self, point: Tuple) -> Color {
+    pub fn color_at(&self, point: Tuple) -> Color {
         let c = (point.x().floor() + point.y().floor() + point.z().floor()) as i32;
         if c % 2 == 0 {
             self.a

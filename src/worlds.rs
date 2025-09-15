@@ -113,12 +113,10 @@ impl<'a> World<'a> {
 pub mod tests {
     use super::*;
     use crate::colors::BLACK;
-    use crate::matrices::Matrix;
-    use crate::patterns::tests::TestPattern;
     use crate::shapes::planes::Plane;
     use crate::shapes::spheres::Sphere;
     use crate::transformations::{scaling, translation};
-    use std::sync::Arc;
+    use crate::patterns::Pattern;
 
     pub fn default_world_objects() -> (Sphere, Sphere) {
         let mut s1 = Sphere::default();
@@ -380,7 +378,7 @@ pub mod tests {
     fn the_refracted_color_with_a_refracted_ray() {
         let (mut s1, mut s2) = default_world_objects();
         s1.material.ambient = 1.0;
-        s1.material.pattern = Some(Arc::new(TestPattern::new(Matrix::identity())));
+        s1.material.pattern = Some(Pattern::new_test());
         s2.material.transparency = 1.0;
         s2.material.refractive_index = 1.5;
         let w = default_world(&s1, &s2);

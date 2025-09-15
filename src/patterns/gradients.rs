@@ -1,12 +1,10 @@
 use crate::colors::Color;
-use crate::matrices::Matrix;
-use crate::patterns::Pattern;
 use crate::tuples::Tuple;
 
+#[derive(Debug, Clone)]
 pub struct GradientPattern {
     a: Color,
     b: Color,
-    transform_inverse: Matrix<4>,
 }
 
 impl GradientPattern {
@@ -14,20 +12,10 @@ impl GradientPattern {
         GradientPattern {
             a,
             b,
-            transform_inverse: Matrix::identity(),
         }
     }
 
-    pub fn set_transform(&mut self, transform: Matrix<4>) {
-        self.transform_inverse = transform.inverse();
-    }
-}
-
-impl Pattern for GradientPattern {
-    fn transform_inverse(&self) -> Matrix<4> {
-        self.transform_inverse
-    }
-    fn color_at(&self, point: Tuple) -> Color {
+    pub fn color_at(&self, point: Tuple) -> Color {
         let distance = self.b - self.a;
         let fraction = point.x() - point.x().floor();
         self.a + distance * fraction

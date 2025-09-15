@@ -2,18 +2,17 @@ use rt_rust::cameras::Camera;
 use rt_rust::colors::{BLACK, Color, WHITE};
 use rt_rust::lights::PointLight;
 use rt_rust::matrices::Matrix;
-use rt_rust::patterns::checkers::CheckerPattern;
+use rt_rust::patterns::Pattern;
 use rt_rust::shapes::planes::Plane;
 use rt_rust::shapes::spheres::Sphere;
 use rt_rust::transformations::{scaling, translation, view_transform};
 use rt_rust::tuples::Tuple;
 use rt_rust::worlds::World;
 use std::f32::consts::PI;
-use std::sync::Arc;
 
 fn main() {
     let mut floor = Plane::new(translation(0.0, -2.0, 0.0));
-    floor.material.pattern = Some(Arc::new(CheckerPattern::new(BLACK, WHITE)));
+    floor.material.pattern = Some(Pattern::new_checker(BLACK, WHITE));
 
     let mut glass = Sphere::glass(Matrix::identity());
     glass.material.ambient = 0.0;
