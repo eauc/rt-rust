@@ -67,7 +67,7 @@ mod tests {
     use super::*;
     use crate::colors::Color;
     use crate::transformations::{rotation_y, translation, view_transform};
-    use crate::worlds::tests::{default_world, default_world_objects};
+    use crate::worlds::tests::default_world;
     use std::f32::consts::PI;
 
     #[test]
@@ -126,8 +126,7 @@ mod tests {
 
     #[test]
     fn rendering_a_world_with_a_camera() {
-        let (s1, s2) = default_world_objects();
-        let w = default_world(&s1, &s2);
+        let w = default_world();
         let from = Tuple::point(0.0, 0.0, -5.0);
         let to = Tuple::point(0.0, 0.0, 0.0);
         let up = Tuple::vector(0.0, 1.0, 0.0);

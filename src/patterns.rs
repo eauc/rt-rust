@@ -1,6 +1,6 @@
 use crate::colors::Color;
 use crate::matrices::Matrix;
-use crate::shapes::Shape;
+use crate::objects::Object;
 use crate::tuples::Tuple;
 
 mod checkers;
@@ -45,8 +45,8 @@ impl Pattern {
         }
     }
 
-    pub fn color_at_object(&self, object: &dyn Shape, world_point: Tuple) -> Color {
-        let object_point = object.transform_inverse() * world_point;
+    pub fn color_at_object(&self, object: &Object, world_point: Tuple) -> Color {
+        let object_point = object.transform_inverse * world_point;
         let pattern_point = self.transform_inverse * object_point;
         self.pattern.color_at(pattern_point)
     }
@@ -85,13 +85,12 @@ impl TestPattern {
 #[cfg(test)]
 pub mod tests {
     use super::*;
-    use crate::shapes::spheres::Sphere;
     use crate::transformations::{scaling, translation};
     use crate::tuples::Tuple;
 
     #[test]
     fn a_pattern_with_an_object_transformation() {
-        let object = Sphere::new(scaling(2.0, 2.0, 2.0));
+        let object = Object::new_sphere().with_transform(scaling(2.0, 2.0, 2.0));
         let pattern = Pattern::new(Patterns::Test(TestPattern));
         let c = pattern.color_at_object(&object, Tuple::point(2.0, 3.0, 4.0));
         assert_eq!(c, Color::new(1.0, 1.5, 2.0));
@@ -99,7 +98,7 @@ pub mod tests {
 
     #[test]
     fn a_pattern_with_a_pattern_transformation() {
-        let object = Sphere::default();
+        let object = Object::new_sphere();
         let pattern =
             Pattern::new(Patterns::Test(TestPattern)).with_transform(scaling(2.0, 2.0, 2.0));
         let c = pattern.color_at_object(&object, Tuple::point(2.0, 3.0, 4.0));
@@ -108,7 +107,7 @@ pub mod tests {
 
     #[test]
     fn a_pattern_with_both_an_object_and_a_pattern_transformation() {
-        let object = Sphere::new(scaling(2.0, 2.0, 2.0));
+        let object = Object::new_sphere().with_transform(scaling(2.0, 2.0, 2.0));
         let pattern =
             Pattern::new(Patterns::Test(TestPattern)).with_transform(translation(0.5, 1.0, 1.5));
         let c = pattern.color_at_object(&object, Tuple::point(2.5, 3.0, 3.5));

@@ -2,9 +2,8 @@ use rt_rust::canvas::Canvas;
 use rt_rust::colors::Color;
 use rt_rust::intersections;
 use rt_rust::lights::PointLight;
+use rt_rust::objects::Object;
 use rt_rust::rays::Ray;
-use rt_rust::shapes::{intersect, normal_at};
-use rt_rust::shapes::spheres::Sphere;
 use rt_rust::tuples::Tuple;
 
 fn main() {
@@ -15,7 +14,7 @@ fn main() {
     let pixel_size = wall_size / canvas_pixel as f32;
     let half = wall_size / 2.0;
     let mut canvas = Canvas::new(canvas_pixel, canvas_pixel);
-    let mut sphere = Sphere::default();
+    let mut sphere = Object::new_sphere();
     sphere.material.color = Color::new(1.0, 0.2, 1.0);
     let light = PointLight::new(Tuple::point(-10.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
     for y in 0..canvas_pixel {
@@ -24,10 +23,10 @@ fn main() {
             let world_x = -half + pixel_size * x as f32;
             let position = Tuple::point(world_x, world_y, wall_z);
             let ray = Ray::new(ray_origin, (position - ray_origin).normalize());
-            let xs = intersect(&sphere, &ray);
+            let xs = sphere.intersect(&ray);
             if let Some(hit) = intersections::hit(&xs) {
                 let hit_point = ray.position(hit.t);
-                let normalv = normal_at(hit.object, hit_point);
+                let normalv = hit.object.normal_at(hit_point);
                 let eyev = -ray.direction;
                 let color = sphere
                     .material

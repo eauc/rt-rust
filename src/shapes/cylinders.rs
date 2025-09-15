@@ -1,46 +1,51 @@
 use crate::coordinates::{Coordinate, EPSILON, equals};
-use crate::intersections::Intersection;
-use crate::materials::Material;
-use crate::matrices::Matrix;
 use crate::rays::Ray;
-use crate::shapes::Shape;
 use crate::tuples::Tuple;
 
 pub struct Cylinder {
     pub closed: bool,
     pub minimum: Coordinate,
     pub maximum: Coordinate,
-    pub material: Material,
-    transform_inverse: Matrix<4>,
-    transform_inverse_transpose: Matrix<4>,
 }
 
 impl Cylinder {
-    pub fn new(transform: Matrix<4>) -> Cylinder {
-        let transform_inverse = transform.inverse();
+    pub fn new() -> Cylinder {
         Cylinder {
             closed: false,
             minimum: -Coordinate::INFINITY,
             maximum: Coordinate::INFINITY,
-            material: Material::default(),
-            transform_inverse,
-            transform_inverse_transpose: transform_inverse.transpose(),
         }
     }
-    fn intersect_caps<'a>(&'a self, ray: &Ray, xs: &mut Vec<Intersection<'a>>) {
+    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Coordinate> {
+        let mut xs = vec![];
+        self.intersect_sides(ray, &mut xs);
+        self.intersect_caps(ray, &mut xs);
+        xs
+    }
+    pub fn local_normal_at(&self, local_point: Tuple) -> Tuple {
+        let dist = local_point.x().powi(2) + local_point.z().powi(2);
+        if dist < 1.0 && local_point.y() >= self.maximum - EPSILON {
+            return Tuple::vector(0.0, 1.0, 0.0);
+        }
+        if dist < 1.0 && local_point.y() <= self.minimum + EPSILON {
+            return Tuple::vector(0.0, -1.0, 0.0);
+        }
+        Tuple::vector(local_point.x(), 0.0, local_point.z())
+    }
+    fn intersect_caps<'a>(&'a self, ray: &Ray, xs: &mut Vec<Coordinate>) {
         if !self.closed || equals(ray.direction.y(), 0.0) {
             return;
         }
         let t = (self.minimum - ray.origin.y()) / ray.direction.y();
         if check_cap(ray, t) {
-            xs.push(Intersection::new(t, self));
+            xs.push(t);
         }
         let t = (self.maximum - ray.origin.y()) / ray.direction.y();
         if check_cap(ray, t) {
-            xs.push(Intersection::new(t, self));
+            xs.push(t);
         }
     }
-    fn intersect_sides<'a>(&'a self, ray: &Ray, xs: &mut Vec<Intersection<'a>>) {
+    fn intersect_sides<'a>(&'a self, ray: &Ray, xs: &mut Vec<Coordinate>) {
         let a = ray.direction.x().powi(2) + ray.direction.z().powi(2);
         if equals(a, 0.0) {
             return;
@@ -56,11 +61,11 @@ impl Cylinder {
         let (t0, t1) = (t0.min(t1), t0.max(t1));
         let y0 = ray.origin.y() + t0 * ray.direction.y();
         if self.minimum < y0 && y0 < self.maximum {
-            xs.push(Intersection::new(t0, self));
+            xs.push(t0);
         }
         let y1 = ray.origin.y() + t1 * ray.direction.y();
         if self.minimum < y1 && y1 < self.maximum {
-            xs.push(Intersection::new(t1, self));
+            xs.push(t1);
         }
     }
 }
@@ -71,34 +76,6 @@ fn check_cap(ray: &Ray, t: Coordinate) -> bool {
     return x.powi(2) + z.powi(2) <= 1.0 + EPSILON;
 }
 
-impl Shape for Cylinder {
-    fn material(&self) -> &Material {
-        &self.material
-    }
-    fn transform_inverse(&self) -> Matrix<4> {
-        self.transform_inverse
-    }
-    fn transform_inverse_transpose(&self) -> Matrix<4> {
-        self.transform_inverse_transpose
-    }
-    fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Intersection<'a>> {
-        let mut xs = vec![];
-        self.intersect_sides(ray, &mut xs);
-        self.intersect_caps(ray, &mut xs);
-        xs
-    }
-    fn local_normal_at(&self, local_point: Tuple) -> Tuple {
-        let dist = local_point.x().powi(2) + local_point.z().powi(2);
-        if dist < 1.0 && local_point.y() >= self.maximum - EPSILON {
-            return Tuple::vector(0.0, 1.0, 0.0);
-        }
-        if dist < 1.0 && local_point.y() <= self.minimum + EPSILON {
-            return Tuple::vector(0.0, -1.0, 0.0);
-        }
-        Tuple::vector(local_point.x(), 0.0, local_point.z())
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -106,7 +83,7 @@ mod tests {
 
     #[test]
     fn a_ray_misses_a_cylinder() {
-        let cyl = Cylinder::new(Matrix::identity());
+        let cyl = Cylinder::new();
         let origins = vec![
             Tuple::point(1.0, 0.0, 0.0),
             Tuple::point(0.0, 0.0, 0.0),
@@ -126,7 +103,7 @@ mod tests {
 
     #[test]
     fn a_ray_strikes_a_cylinder() {
-        let cyl = Cylinder::new(Matrix::identity());
+        let cyl = Cylinder::new();
         let origins = vec![
             Tuple::point(1.0, 0.0, -5.0),
             Tuple::point(0.0, 0.0, -5.0),
@@ -141,16 +118,13 @@ mod tests {
         for i in 0..origins.len() {
             let r = Ray::new(origins[i], directions[i]);
             let xs = cyl.local_intersect(&r);
-            assert_eq!(
-                xs.iter().map(|x| x.t).collect::<Vec<Coordinate>>(),
-                results[i]
-            );
+            assert_eq!(xs, results[i]);
         }
     }
 
     #[test]
     fn normal_vector_on_a_cylinder() {
-        let cyl = Cylinder::new(Matrix::identity());
+        let cyl = Cylinder::new();
         let points = vec![
             Tuple::point(1.0, 0.0, 0.0),
             Tuple::point(0.0, 5.0, -1.0),
@@ -171,14 +145,14 @@ mod tests {
 
     #[test]
     fn the_default_minimum_and_maximum_for_a_cylinder() {
-        let cyl = Cylinder::new(Matrix::identity());
+        let cyl = Cylinder::new();
         assert_eq!(cyl.minimum, -Coordinate::INFINITY);
         assert_eq!(cyl.maximum, Coordinate::INFINITY);
     }
 
     #[test]
     fn intersecting_a_constrained_cylinder() {
-        let mut cyl = Cylinder::new(Matrix::identity());
+        let mut cyl = Cylinder::new();
         cyl.minimum = 1.0;
         cyl.maximum = 2.0;
         let points = vec![
@@ -207,13 +181,13 @@ mod tests {
 
     #[test]
     fn the_default_closed_value_for_a_cylinder() {
-        let cyl = Cylinder::new(Matrix::identity());
+        let cyl = Cylinder::new();
         assert_eq!(cyl.closed, false);
     }
 
     #[test]
     fn intersecting_the_caps_of_a_closed_cylinder() {
-        let mut cyl = Cylinder::new(Matrix::identity());
+        let mut cyl = Cylinder::new();
         cyl.minimum = 1.0;
         cyl.maximum = 2.0;
         cyl.closed = true;
@@ -241,7 +215,7 @@ mod tests {
 
     #[test]
     fn the_normal_vector_on_a_cylinders_end_caps() {
-        let mut cyl = Cylinder::new(Matrix::identity());
+        let mut cyl = Cylinder::new();
         cyl.minimum = 1.0;
         cyl.maximum = 2.0;
         cyl.closed = true;

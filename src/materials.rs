@@ -1,8 +1,8 @@
 use crate::colors::{BLACK, Color, WHITE};
 use crate::coordinates::Coordinate;
 use crate::lights::PointLight;
-use crate::patterns::{Pattern};
-use crate::shapes::Shape;
+use crate::patterns::Pattern;
+use crate::objects::Object;
 use crate::tuples::Tuple;
 use std::fmt;
 
@@ -33,10 +33,23 @@ impl Material {
             transparency: 0.0,
         }
     }
+    pub fn glass() -> Material {
+        Material {
+            pattern: None,
+            color: WHITE,
+            ambient: 0.0,
+            diffuse: 0.588235,
+            specular: 0.9,
+            transparency: 1.0,
+            reflective: 0.08,
+            refractive_index: 1.5,
+            shininess: 300.0,
+        }
+    }
 
     pub fn lighting(
         &self,
-        object: &dyn Shape,
+        object: &Object,
         light: &PointLight,
         position: Tuple,
         eyev: Tuple,
@@ -97,7 +110,6 @@ impl fmt::Debug for Material {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::shapes::spheres::Sphere;
 
     #[test]
     fn the_default_material() {
@@ -119,7 +131,7 @@ mod tests {
         let position = Tuple::point(0.0, 0.0, 0.0);
         let eyev = Tuple::vector(0.0, 0.0, -1.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
-        let s = Sphere::default();
+        let s = Object::new_sphere();
         let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), Color::new(1.0, 1.0, 1.0));
         let result = m.lighting(&s, &light, position, eyev, normalv, false);
         assert_eq!(result, Color::new(1.9, 1.9, 1.9));
@@ -131,7 +143,7 @@ mod tests {
         let position = Tuple::point(0.0, 0.0, 0.0);
         let eyev = Tuple::vector(0.0, (2.0_f32).sqrt() / 2.0, (2.0_f32).sqrt() / 2.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
-        let s = Sphere::default();
+        let s = Object::new_sphere();
         let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), Color::new(1.0, 1.0, 1.0));
         let result = m.lighting(&s, &light, position, eyev, normalv, false);
         assert_eq!(result, Color::new(1.0, 1.0, 1.0));
@@ -143,7 +155,7 @@ mod tests {
         let position = Tuple::point(0.0, 0.0, 0.0);
         let eyev = Tuple::vector(0.0, 0.0, -1.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
-        let s = Sphere::default();
+        let s = Object::new_sphere();
         let light = PointLight::new(Tuple::point(0.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
         let result = m.lighting(&s, &light, position, eyev, normalv, false);
         assert_eq!(result, Color::new(0.7364, 0.7364, 0.7364));
@@ -155,7 +167,7 @@ mod tests {
         let position = Tuple::point(0.0, 0.0, 0.0);
         let eyev = Tuple::vector(0.0, -(2.0_f32).sqrt() / 2.0, -(2.0_f32).sqrt() / 2.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
-        let s = Sphere::default();
+        let s = Object::new_sphere();
         let light = PointLight::new(Tuple::point(0.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
         let result = m.lighting(&s, &light, position, eyev, normalv, false);
         assert_eq!(result, Color::new(1.6363853, 1.6363853, 1.6363853));
@@ -167,7 +179,7 @@ mod tests {
         let position = Tuple::point(0.0, 0.0, 0.0);
         let eyev = Tuple::vector(0.0, 0.0, -1.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
-        let s = Sphere::default();
+        let s = Object::new_sphere();
         let light = PointLight::new(Tuple::point(0.0, 0.0, 10.0), Color::new(1.0, 1.0, 1.0));
         let result = m.lighting(&s, &light, position, eyev, normalv, false);
         assert_eq!(result, Color::new(0.1, 0.1, 0.1));
@@ -179,7 +191,7 @@ mod tests {
         let position = Tuple::point(0.0, 0.0, 0.0);
         let eyev = Tuple::vector(0.0, 0.0, -1.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
-        let s = Sphere::default();
+        let s = Object::new_sphere();
         let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), Color::new(1.0, 1.0, 1.0));
         let in_shadow = true;
         let result = m.lighting(&s, &light, position, eyev, normalv, in_shadow);
@@ -195,7 +207,7 @@ mod tests {
         m.specular = 0.0;
         let eyev = Tuple::vector(0.0, 0.0, -1.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
-        let s = Sphere::default();
+        let s = Object::new_sphere();
         let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), WHITE);
         let c1 = m.lighting(
             &s,

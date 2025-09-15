@@ -2,7 +2,7 @@ use rt_rust::cameras::Camera;
 use rt_rust::colors::Color;
 use rt_rust::lights::PointLight;
 use rt_rust::materials::Material;
-use rt_rust::shapes::spheres::Sphere;
+use rt_rust::objects::Object;
 use rt_rust::transformations::{rotation_x, rotation_y, scaling, translation, view_transform};
 use rt_rust::tuples::Tuple;
 use rt_rust::worlds::World;
@@ -12,16 +12,16 @@ fn main() {
     let mut wall_material = Material::default();
     wall_material.color = Color::new(1.0, 0.9, 0.9);
     wall_material.specular = 0.0;
-    let mut floor = Sphere::new(scaling(10.0, 0.01, 10.0));
+    let mut floor = Object::new_sphere().with_transform(scaling(10.0, 0.01, 10.0));
     floor.material = wall_material.clone();
-    let mut left_wall = Sphere::new(
+    let mut left_wall = Object::new_sphere().with_transform(
         translation(0.0, 0.0, 5.0)
             * rotation_y(-PI / 4.0)
             * rotation_x(PI / 2.0)
             * scaling(10.0, 0.01, 10.0),
     );
     left_wall.material = wall_material.clone();
-    let mut right_wall = Sphere::new(
+    let mut right_wall = Object::new_sphere().with_transform(
         translation(0.0, 0.0, 5.0)
             * rotation_y(PI / 4.0)
             * rotation_x(PI / 2.0)
@@ -29,26 +29,26 @@ fn main() {
     );
     right_wall.material = wall_material.clone();
 
-    let mut middle = Sphere::new(translation(-0.5, 1.0, 0.5));
+    let mut middle = Object::new_sphere().with_transform(translation(-0.5, 1.0, 0.5));
     middle.material.color = Color::new(0.1, 1.0, 0.5);
     middle.material.diffuse = 0.7;
     middle.material.specular = 0.3;
 
-    let mut right = Sphere::new(translation(1.5, 0.5, -0.5) * scaling(0.5, 0.5, 0.5));
+    let mut right =
+        Object::new_sphere().with_transform(translation(1.5, 0.5, -0.5) * scaling(0.5, 0.5, 0.5));
     right.material.color = Color::new(0.5, 1.0, 0.1);
     right.material.diffuse = 0.7;
     right.material.specular = 0.3;
 
-    let mut left = Sphere::new(translation(-1.5, 0.33, -0.75) * scaling(0.33, 0.33, 0.33));
+    let mut left = Object::new_sphere()
+        .with_transform(translation(-1.5, 0.33, -0.75) * scaling(0.33, 0.33, 0.33));
     left.material.color = Color::new(1.0, 0.8, 0.1);
     left.material.diffuse = 0.7;
     left.material.specular = 0.3;
 
     let light = PointLight::new(Tuple::point(-10.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
-    let world = World::new(
-        light,
-        vec![&floor, &left_wall, &right_wall, &middle, &right, &left],
-    );
+    let mut world = World::new(light);
+    world.objects = vec![floor, left_wall, right_wall, middle, right, left];
 
     let camera = Camera::new(
         300,
