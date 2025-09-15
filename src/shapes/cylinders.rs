@@ -1,22 +1,22 @@
-use crate::coordinates::{Coordinate, EPSILON, equals};
+use crate::floats::{Float, EPSILON, equals};
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
 pub struct Cylinder {
     pub closed: bool,
-    pub minimum: Coordinate,
-    pub maximum: Coordinate,
+    pub minimum: Float,
+    pub maximum: Float,
 }
 
 impl Cylinder {
     pub fn new() -> Cylinder {
         Cylinder {
             closed: false,
-            minimum: -Coordinate::INFINITY,
-            maximum: Coordinate::INFINITY,
+            minimum: -Float::INFINITY,
+            maximum: Float::INFINITY,
         }
     }
-    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Coordinate> {
+    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Float> {
         let mut xs = vec![];
         self.intersect_sides(ray, &mut xs);
         self.intersect_caps(ray, &mut xs);
@@ -32,7 +32,7 @@ impl Cylinder {
         }
         Tuple::vector(local_point.x(), 0.0, local_point.z())
     }
-    fn intersect_caps<'a>(&'a self, ray: &Ray, xs: &mut Vec<Coordinate>) {
+    fn intersect_caps<'a>(&'a self, ray: &Ray, xs: &mut Vec<Float>) {
         if !self.closed || equals(ray.direction.y(), 0.0) {
             return;
         }
@@ -45,7 +45,7 @@ impl Cylinder {
             xs.push(t);
         }
     }
-    fn intersect_sides<'a>(&'a self, ray: &Ray, xs: &mut Vec<Coordinate>) {
+    fn intersect_sides<'a>(&'a self, ray: &Ray, xs: &mut Vec<Float>) {
         let a = ray.direction.x().powi(2) + ray.direction.z().powi(2);
         if equals(a, 0.0) {
             return;
@@ -70,7 +70,7 @@ impl Cylinder {
     }
 }
 
-fn check_cap(ray: &Ray, t: Coordinate) -> bool {
+fn check_cap(ray: &Ray, t: Float) -> bool {
     let x = ray.origin.x() + t * ray.direction.x();
     let z = ray.origin.z() + t * ray.direction.z();
     return x.powi(2) + z.powi(2) <= 1.0 + EPSILON;
@@ -79,7 +79,7 @@ fn check_cap(ray: &Ray, t: Coordinate) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::coordinates::Coordinate;
+    use crate::floats::Float;
 
     #[test]
     fn a_ray_misses_a_cylinder() {
@@ -146,8 +146,8 @@ mod tests {
     #[test]
     fn the_default_minimum_and_maximum_for_a_cylinder() {
         let cyl = Cylinder::new();
-        assert_eq!(cyl.minimum, -Coordinate::INFINITY);
-        assert_eq!(cyl.maximum, Coordinate::INFINITY);
+        assert_eq!(cyl.minimum, -Float::INFINITY);
+        assert_eq!(cyl.maximum, Float::INFINITY);
     }
 
     #[test]

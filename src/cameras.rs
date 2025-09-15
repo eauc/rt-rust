@@ -1,5 +1,5 @@
 use crate::canvas::Canvas;
-use crate::coordinates::Coordinate;
+use crate::floats::Float;
 use crate::matrices::Matrix;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
@@ -8,9 +8,9 @@ use crate::worlds::World;
 pub struct Camera {
     hsize: usize,
     vsize: usize,
-    half_width: Coordinate,
-    half_height: Coordinate,
-    pixel_size: Coordinate,
+    half_width: Float,
+    half_height: Float,
+    pixel_size: Float,
     transform_inv: Matrix<4>,
 }
 
@@ -18,11 +18,11 @@ impl Camera {
     pub fn new(
         hsize: usize,
         vsize: usize,
-        field_of_view: Coordinate,
+        field_of_view: Float,
         transform: Matrix<4>,
     ) -> Camera {
         let half_view = (field_of_view / 2.0).tan();
-        let aspect = hsize as Coordinate / vsize as Coordinate;
+        let aspect = hsize as Float / vsize as Float;
         let (half_width, half_height) = if aspect >= 1.0 {
             (half_view, half_view / aspect)
         } else {
@@ -33,14 +33,14 @@ impl Camera {
             vsize,
             half_width,
             half_height,
-            pixel_size: half_width * 2.0 / hsize as Coordinate,
+            pixel_size: half_width * 2.0 / hsize as Float,
             transform_inv: transform.inverse(),
         }
     }
 
     fn ray_for_pixel(&self, x: usize, y: usize) -> Ray {
-        let x_offset = (x as Coordinate + 0.5) * self.pixel_size;
-        let y_offset = (y as Coordinate + 0.5) * self.pixel_size;
+        let x_offset = (x as Float + 0.5) * self.pixel_size;
+        let y_offset = (y as Float + 0.5) * self.pixel_size;
         let world_x = self.half_width - x_offset;
         let world_y = self.half_height - y_offset;
         let pixel = self.transform_inv * Tuple::point(world_x, world_y, -1.0);

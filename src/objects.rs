@@ -1,4 +1,4 @@
-use crate::coordinates::Coordinate;
+use crate::floats::Float;
 use crate::intersections::Intersection;
 use crate::materials::Material;
 use crate::matrices::Matrix;
@@ -30,7 +30,7 @@ impl Object {
     pub fn new_cone() -> Object {
         Object::new(Shapes::Cone(Cone::new()))
     }
-    pub fn new_cone_truncated(min: Coordinate, max: Coordinate, closed: bool) -> Object {
+    pub fn new_cone_truncated(min: Float, max: Float, closed: bool) -> Object {
         let mut cone = Cone::new();
         cone.minimum = min;
         cone.maximum = max;
@@ -43,7 +43,7 @@ impl Object {
     pub fn new_cylinder() -> Object {
         Object::new(Shapes::Cylinder(Cylinder::new()))
     }
-    pub fn new_cylinder_truncated(min: Coordinate, max: Coordinate, closed: bool) -> Object {
+    pub fn new_cylinder_truncated(min: Float, max: Float, closed: bool) -> Object {
         let mut cylinder = Cylinder::new();
         cylinder.minimum = min;
         cylinder.maximum = max;

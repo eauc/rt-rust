@@ -1,5 +1,5 @@
 use crate::colors::{BLACK, Color, WHITE};
-use crate::coordinates::Coordinate;
+use crate::floats::Float;
 use crate::lights::PointLight;
 use crate::patterns::Pattern;
 use crate::objects::Object;
@@ -10,13 +10,13 @@ use std::fmt;
 pub struct Material {
     pub pattern: Option<Pattern>,
     pub color: Color,
-    pub ambient: Coordinate,
-    pub diffuse: Coordinate,
-    pub reflective: Coordinate,
-    pub refractive_index: Coordinate,
-    pub shininess: Coordinate,
-    pub specular: Coordinate,
-    pub transparency: Coordinate,
+    pub ambient: Float,
+    pub diffuse: Float,
+    pub reflective: Float,
+    pub refractive_index: Float,
+    pub shininess: Float,
+    pub specular: Float,
+    pub transparency: Float,
 }
 
 impl Material {

@@ -1,8 +1,8 @@
-use crate::coordinates::Coordinate;
+use crate::floats::Float;
 use crate::matrices::Matrix;
 use crate::tuples::Tuple;
 
-pub fn translation(x: Coordinate, y: Coordinate, z: Coordinate) -> Matrix<4> {
+pub fn translation(x: Float, y: Float, z: Float) -> Matrix<4> {
     Matrix::new([
         [1.0, 0.0, 0.0, x],
         [0.0, 1.0, 0.0, y],
@@ -11,7 +11,7 @@ pub fn translation(x: Coordinate, y: Coordinate, z: Coordinate) -> Matrix<4> {
     ])
 }
 
-pub fn scaling(x: Coordinate, y: Coordinate, z: Coordinate) -> Matrix<4> {
+pub fn scaling(x: Float, y: Float, z: Float) -> Matrix<4> {
     Matrix::new([
         [x, 0.0, 0.0, 0.0],
         [0.0, y, 0.0, 0.0],
@@ -20,7 +20,7 @@ pub fn scaling(x: Coordinate, y: Coordinate, z: Coordinate) -> Matrix<4> {
     ])
 }
 
-pub fn rotation_x(r: Coordinate) -> Matrix<4> {
+pub fn rotation_x(r: Float) -> Matrix<4> {
     Matrix::new([
         [1.0, 0.0, 0.0, 0.0],
         [0.0, r.cos(), -r.sin(), 0.0],
@@ -29,7 +29,7 @@ pub fn rotation_x(r: Coordinate) -> Matrix<4> {
     ])
 }
 
-pub fn rotation_y(r: Coordinate) -> Matrix<4> {
+pub fn rotation_y(r: Float) -> Matrix<4> {
     Matrix::new([
         [r.cos(), 0.0, r.sin(), 0.0],
         [0.0, 1.0, 0.0, 0.0],
@@ -38,7 +38,7 @@ pub fn rotation_y(r: Coordinate) -> Matrix<4> {
     ])
 }
 
-pub fn rotation_z(r: Coordinate) -> Matrix<4> {
+pub fn rotation_z(r: Float) -> Matrix<4> {
     Matrix::new([
         [r.cos(), -r.sin(), 0.0, 0.0],
         [r.sin(), r.cos(), 0.0, 0.0],
@@ -48,12 +48,12 @@ pub fn rotation_z(r: Coordinate) -> Matrix<4> {
 }
 
 pub fn shearing(
-    xy: Coordinate,
-    xz: Coordinate,
-    yx: Coordinate,
-    yz: Coordinate,
-    zx: Coordinate,
-    zy: Coordinate,
+    xy: Float,
+    xz: Float,
+    yx: Float,
+    yz: Float,
+    zx: Float,
+    zy: Float,
 ) -> Matrix<4> {
     Matrix::new([
         [1.0, xy, xz, 0.0],

@@ -1,4 +1,4 @@
-use crate::coordinates::Coordinate;
+use crate::floats::Float;
 use crate::matrices::Matrix;
 use crate::tuples::Tuple;
 
@@ -13,7 +13,7 @@ impl Ray {
         Ray { origin, direction }
     }
 
-    pub fn position(&self, t: Coordinate) -> Tuple {
+    pub fn position(&self, t: Float) -> Tuple {
         self.origin + self.direction * t
     }
 

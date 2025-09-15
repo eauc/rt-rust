@@ -1,4 +1,4 @@
-use crate::coordinates::Coordinate;
+use crate::floats::Float;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
@@ -9,7 +9,7 @@ impl Sphere {
         Sphere
     }
 
-    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Coordinate> {
+    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Float> {
         let sphere_to_ray = ray.origin - Tuple::point(0.0, 0.0, 0.0);
         let a = ray.direction.dot(ray.direction);
         let b = 2.0 * ray.direction.dot(sphere_to_ray);

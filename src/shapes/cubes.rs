@@ -1,4 +1,4 @@
-use crate::coordinates::{Coordinate, EPSILON};
+use crate::floats::{Float, EPSILON};
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
@@ -9,7 +9,7 @@ impl Cube {
         Cube
     }
 
-    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Coordinate> {
+    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Float> {
         let (xtmin, xtmax) = check_axis(ray.origin.x(), ray.direction.x());
         let (ytmin, ytmax) = check_axis(ray.origin.y(), ray.direction.y());
         let (ztmin, ztmax) = check_axis(ray.origin.z(), ray.direction.z());
@@ -36,7 +36,7 @@ impl Cube {
     }
 }
 
-fn check_axis(origin: Coordinate, direction: Coordinate) -> (Coordinate, Coordinate) {
+fn check_axis(origin: Float, direction: Float) -> (Float, Float) {
     let tmin_numerator = -1.0 - origin;
     let tmax_numerator = 1.0 - origin;
 
@@ -44,8 +44,8 @@ fn check_axis(origin: Coordinate, direction: Coordinate) -> (Coordinate, Coordin
         (tmin_numerator / direction, tmax_numerator / direction)
     } else {
         (
-            tmin_numerator * Coordinate::INFINITY,
-            tmax_numerator * Coordinate::INFINITY,
+            tmin_numerator * Float::INFINITY,
+            tmax_numerator * Float::INFINITY,
         )
     };
     if tmin > tmax {

@@ -1,29 +1,29 @@
-use crate::coordinates::{Coordinate, equals};
+use crate::floats::{Float, equals};
 use std::{cmp, ops};
 
 #[derive(Debug, Copy, Clone)]
-pub struct Tuple(Coordinate, Coordinate, Coordinate, Coordinate);
+pub struct Tuple(Float, Float, Float, Float);
 
 impl Tuple {
-    pub fn new(x: Coordinate, y: Coordinate, z: Coordinate, w: Coordinate) -> Tuple {
+    pub fn new(x: Float, y: Float, z: Float, w: Float) -> Tuple {
         Tuple(x, y, z, w)
     }
-    pub fn point(x: Coordinate, y: Coordinate, z: Coordinate) -> Tuple {
+    pub fn point(x: Float, y: Float, z: Float) -> Tuple {
         Tuple(x, y, z, 1.0)
     }
-    pub fn vector(x: Coordinate, y: Coordinate, z: Coordinate) -> Tuple {
+    pub fn vector(x: Float, y: Float, z: Float) -> Tuple {
         Tuple(x, y, z, 0.0)
     }
-    pub fn x(&self) -> Coordinate {
+    pub fn x(&self) -> Float {
         self.0
     }
-    pub fn y(&self) -> Coordinate {
+    pub fn y(&self) -> Float {
         self.1
     }
-    pub fn z(&self) -> Coordinate {
+    pub fn z(&self) -> Float {
         self.2
     }
-    pub fn w(&self) -> Coordinate {
+    pub fn w(&self) -> Float {
         self.3
     }
     pub fn to_vector(&mut self) -> &Tuple {
@@ -31,7 +31,7 @@ impl Tuple {
         self
     }
 
-    pub fn magnitude(&self) -> Coordinate {
+    pub fn magnitude(&self) -> Float {
         ((self.x() * self.x()) + (self.y() * self.y()) + (self.z() * self.z())).sqrt()
     }
 
@@ -45,7 +45,7 @@ impl Tuple {
         )
     }
 
-    pub fn dot(self, other: Tuple) -> Coordinate {
+    pub fn dot(self, other: Tuple) -> Float {
         self.x() * other.x() + self.y() * other.y() + self.z() * other.z() + self.w() * other.w()
     }
 
@@ -105,10 +105,10 @@ impl ops::Neg for Tuple {
     }
 }
 
-impl ops::Mul<Coordinate> for Tuple {
+impl ops::Mul<Float> for Tuple {
     type Output = Tuple;
 
-    fn mul(self, scalar: Coordinate) -> Tuple {
+    fn mul(self, scalar: Float) -> Tuple {
         Tuple(
             self.x() * scalar,
             self.y() * scalar,
@@ -118,10 +118,10 @@ impl ops::Mul<Coordinate> for Tuple {
     }
 }
 
-impl ops::Div<Coordinate> for Tuple {
+impl ops::Div<Float> for Tuple {
     type Output = Tuple;
 
-    fn div(self, scalar: Coordinate) -> Tuple {
+    fn div(self, scalar: Float) -> Tuple {
         Tuple(
             self.x() / scalar,
             self.y() / scalar,
@@ -226,31 +226,31 @@ mod tests {
     #[test]
     fn magnitude_of_vector_1_0_0() {
         let v = Tuple::vector(1.0, 0.0, 0.0);
-        assert_eq!(v.magnitude(), Coordinate::sqrt(1.0));
+        assert_eq!(v.magnitude(), Float::sqrt(1.0));
     }
 
     #[test]
     fn magnitude_of_vector_0_1_0() {
         let v = Tuple::vector(0.0, 1.0, 0.0);
-        assert_eq!(v.magnitude(), Coordinate::sqrt(1.0));
+        assert_eq!(v.magnitude(), Float::sqrt(1.0));
     }
 
     #[test]
     fn magnitude_of_vector_0_0_1() {
         let v = Tuple::vector(0.0, 0.0, 1.0);
-        assert_eq!(v.magnitude(), Coordinate::sqrt(1.0));
+        assert_eq!(v.magnitude(), Float::sqrt(1.0));
     }
 
     #[test]
     fn magnitude_of_vector_1_2_3() {
         let v = Tuple::vector(1.0, 2.0, 3.0);
-        assert_eq!(v.magnitude(), Coordinate::sqrt(14.0));
+        assert_eq!(v.magnitude(), Float::sqrt(14.0));
     }
 
     #[test]
     fn magnitude_of_vector_neg_1_neg_2_neg_3() {
         let v = Tuple::vector(-1.0, -2.0, -3.0);
-        assert_eq!(v.magnitude(), Coordinate::sqrt(14.0));
+        assert_eq!(v.magnitude(), Float::sqrt(14.0));
     }
 
     #[test]

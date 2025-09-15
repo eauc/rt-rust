@@ -1,5 +1,5 @@
 use crate::colors;
-use crate::coordinates::Coordinate;
+use crate::floats::Float;
 
 pub struct Canvas {
     width: usize,
@@ -64,7 +64,7 @@ impl Canvas {
     }
 }
 
-fn ppm_clamp_color(v: Coordinate) -> u8 {
+fn ppm_clamp_color(v: Float) -> u8 {
     (v * 255.0).min(255.0).max(0.0).round() as u8
 }
 

@@ -1,12 +1,12 @@
-use crate::coordinates::{Coordinate, equals};
+use crate::floats::{Float, equals};
 use crate::tuples::Tuple;
 use std::{cmp, ops};
 
 #[derive(Debug, Copy, Clone)]
-pub struct Matrix<const M: usize>([[Coordinate; M]; M]);
+pub struct Matrix<const M: usize>([[Float; M]; M]);
 
 impl<const M: usize> Matrix<M> {
-    pub fn new(data: [[Coordinate; M]; M]) -> Matrix<M> {
+    pub fn new(data: [[Float; M]; M]) -> Matrix<M> {
         Matrix(data)
     }
 
@@ -30,7 +30,7 @@ impl<const M: usize> Matrix<M> {
 }
 
 impl Matrix<2> {
-    fn determinant(self) -> Coordinate {
+    fn determinant(self) -> Float {
         self.0[0][0] * self.0[1][1] - self.0[0][1] * self.0[1][0]
     }
 }
@@ -52,11 +52,11 @@ impl Matrix<3> {
         return Matrix(data);
     }
 
-    fn minor(self, row: usize, column: usize) -> Coordinate {
+    fn minor(self, row: usize, column: usize) -> Float {
         self.submatrix(row, column).determinant()
     }
 
-    fn cofactor(self, row: usize, column: usize) -> Coordinate {
+    fn cofactor(self, row: usize, column: usize) -> Float {
         let minor = self.minor(row, column);
         if (row + column) % 2 == 0 {
             minor
@@ -65,7 +65,7 @@ impl Matrix<3> {
         }
     }
 
-    fn determinant(self) -> Coordinate {
+    fn determinant(self) -> Float {
         self.0[0][0] * self.cofactor(0, 0)
             + self.0[0][1] * self.cofactor(0, 1)
             + self.0[0][2] * self.cofactor(0, 2)
@@ -89,11 +89,11 @@ impl Matrix<4> {
         return Matrix(data);
     }
 
-    fn minor(self, row: usize, column: usize) -> Coordinate {
+    fn minor(self, row: usize, column: usize) -> Float {
         self.submatrix(row, column).determinant()
     }
 
-    fn cofactor(self, row: usize, column: usize) -> Coordinate {
+    fn cofactor(self, row: usize, column: usize) -> Float {
         let minor = self.minor(row, column);
         if (row + column) % 2 == 0 {
             minor
@@ -102,7 +102,7 @@ impl Matrix<4> {
         }
     }
 
-    fn determinant(self) -> Coordinate {
+    fn determinant(self) -> Float {
         self.0[0][0] * self.cofactor(0, 0)
             + self.0[0][1] * self.cofactor(0, 1)
             + self.0[0][2] * self.cofactor(0, 2)
@@ -129,15 +129,15 @@ impl Matrix<4> {
 }
 
 impl<const M: usize> ops::Index<(usize, usize)> for Matrix<M> {
-    type Output = Coordinate;
+    type Output = Float;
 
-    fn index(&self, index: (usize, usize)) -> &Coordinate {
+    fn index(&self, index: (usize, usize)) -> &Float {
         &self.0[index.0][index.1]
     }
 }
 
 impl<const M: usize> ops::IndexMut<(usize, usize)> for Matrix<M> {
-    fn index_mut(&mut self, index: (usize, usize)) -> &mut Coordinate {
+    fn index_mut(&mut self, index: (usize, usize)) -> &mut Float {
         &mut self.0[index.0][index.1]
     }
 }

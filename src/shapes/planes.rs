@@ -1,5 +1,5 @@
-use crate::coordinates::Coordinate;
-use crate::coordinates::equals;
+use crate::floats::Float;
+use crate::floats::equals;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
@@ -10,7 +10,7 @@ impl Plane {
         Plane
     }
 
-    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Coordinate> {
+    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Float> {
         if equals(ray.direction.y(), 0.0) {
             return vec![];
         }

@@ -1,11 +1,11 @@
-use crate::coordinates::{Coordinate, EPSILON};
+use crate::floats::{Float, EPSILON};
 use crate::objects::Object;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 use std::ptr;
 
 pub struct Intersection<'a> {
-    pub t: Coordinate,
+    pub t: Float,
     pub object: &'a Object,
 }
 
@@ -17,12 +17,12 @@ pub struct IntersectionComputations {
     pub normalv: Tuple,
     pub inside: bool,
     pub reflectv: Tuple,
-    pub n1: Coordinate,
-    pub n2: Coordinate,
+    pub n1: Float,
+    pub n2: Float,
 }
 
 impl<'a> Intersection<'a> {
-    pub fn new(t: Coordinate, object: &'a Object) -> Intersection<'a> {
+    pub fn new(t: Float, object: &'a Object) -> Intersection<'a> {
         Intersection { t, object }
     }
 
@@ -53,7 +53,7 @@ impl<'a> Intersection<'a> {
         }
     }
 
-    fn find_refraction_indices(&self, xs: &Vec<Intersection>) -> (Coordinate, Coordinate) {
+    fn find_refraction_indices(&self, xs: &Vec<Intersection>) -> (Float, Float) {
         let mut containers: Vec<&Object> = vec![];
         let mut n1 = 1.0;
         let mut n2 = 1.0;
@@ -84,7 +84,7 @@ pub fn hit<'a>(xs: &'a Vec<Intersection<'a>>) -> Option<&'a Intersection<'a>> {
         .min_by(|i1, i2| i1.t.total_cmp(&i2.t))
 }
 
-pub fn schlick(comps: &IntersectionComputations) -> Coordinate {
+pub fn schlick(comps: &IntersectionComputations) -> Float {
     let mut cos = comps.eyev.dot(comps.normalv);
     if comps.n1 > comps.n2 {
         let n = comps.n1 / comps.n2;

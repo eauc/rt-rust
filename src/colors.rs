@@ -1,23 +1,23 @@
-use crate::coordinates::{Coordinate, equals};
+use crate::floats::{Float, equals};
 use std::{cmp, ops};
 
 #[derive(Debug, Copy, Clone)]
-pub struct Color(Coordinate, Coordinate, Coordinate);
+pub struct Color(Float, Float, Float);
 
 pub const BLACK: Color = Color(0.0, 0.0, 0.0);
 pub const WHITE: Color = Color(1.0, 1.0, 1.0);
 
 impl Color {
-    pub fn new(red: Coordinate, green: Coordinate, blue: Coordinate) -> Color {
+    pub fn new(red: Float, green: Float, blue: Float) -> Color {
         Color(red, green, blue)
     }
-    pub fn red(&self) -> Coordinate {
+    pub fn red(&self) -> Float {
         self.0
     }
-    pub fn green(&self) -> Coordinate {
+    pub fn green(&self) -> Float {
         self.1
     }
-    pub fn blue(&self) -> Coordinate {
+    pub fn blue(&self) -> Float {
         self.2
     }
 }
@@ -54,10 +54,10 @@ impl ops::Sub for Color {
     }
 }
 
-impl ops::Mul<Coordinate> for Color {
+impl ops::Mul<Float> for Color {
     type Output = Color;
 
-    fn mul(self, scalar: Coordinate) -> Color {
+    fn mul(self, scalar: Float) -> Color {
         Color(
             self.red() * scalar,
             self.green() * scalar,

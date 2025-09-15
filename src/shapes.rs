@@ -1,4 +1,4 @@
-use crate::coordinates::Coordinate;
+use crate::floats::Float;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
@@ -18,7 +18,7 @@ pub enum Shapes {
 }
 
 impl Shapes {
-    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Coordinate> {
+    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Float> {
         match self {
             Shapes::Cone(cone) => cone.local_intersect(ray),
             Shapes::Cube(cube) => cube.local_intersect(ray),
@@ -44,7 +44,7 @@ impl Shapes {
 pub struct TestShape;
 
 impl TestShape {
-    fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Coordinate> {
+    fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Float> {
         assert_eq!(
             ray,
             &Ray::new(Tuple::point(0.0, 0.0, -2.5), Tuple::vector(0.0, 0.0, 0.5))
