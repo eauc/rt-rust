@@ -10,6 +10,7 @@ use crate::shapes::cylinders::Cylinder;
 use crate::shapes::groups::Group;
 use crate::shapes::planes::Plane;
 use crate::shapes::spheres::Sphere;
+use crate::shapes::triangles::Triangle;
 use crate::tuples::Tuple;
 
 pub struct Object {
@@ -51,6 +52,9 @@ impl Object {
     }
     pub fn new_sphere() -> Object {
         Object::new(Shapes::Sphere(Sphere::new()))
+    }
+    pub fn new_triangle(p1: Tuple, p2: Tuple, p3: Tuple) -> Object {
+        Object::new(Shapes::Triangle(Triangle::new(p1, p2, p3)))
     }
 
     pub fn as_cone(&self) -> &Cone {
@@ -105,6 +109,12 @@ impl Object {
         match &self.shape {
             Shapes::Sphere(sphere) => sphere,
             _ => panic!("This object is not a sphere !"),
+        }
+    }
+    pub fn as_triangle(&self) -> &Triangle {
+        match &self.shape {
+            Shapes::Triangle(triangle) => triangle,
+            _ => panic!("This object is not a triangle !"),
         }
     }
 

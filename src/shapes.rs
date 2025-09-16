@@ -11,6 +11,7 @@ pub mod cylinders;
 pub mod groups;
 pub mod planes;
 pub mod spheres;
+pub mod triangles;
 
 pub enum Shapes {
     Cone(cones::Cone),
@@ -20,16 +21,20 @@ pub enum Shapes {
     Plane(planes::Plane),
     Sphere(spheres::Sphere),
     Test(TestShape),
+    Triangle(triangles::Triangle),
 }
 
 impl Shapes {
     pub fn prepare_bounds(&mut self, bounds: &mut Bounds) {
         match self {
             Shapes::Cone(cone) => cone.prepare_bounds(bounds),
+            Shapes::Cube(_) => (),
             Shapes::Cylinder(cylinder) => cylinder.prepare_bounds(bounds),
             Shapes::Group(group) => group.prepare_bounds(bounds),
             Shapes::Plane(plane) => plane.prepare_bounds(bounds),
-            _ => (),
+            Shapes::Sphere(_) => (),
+            Shapes::Test(_) => (),
+            Shapes::Triangle(triangle) => triangle.prepare_bounds(bounds),
         }
     }
     pub fn prepare_transform(&mut self, world_to_object: &Matrix<4>, object_to_world: &Matrix<4>) {
@@ -48,6 +53,7 @@ impl Shapes {
             Shapes::Plane(plane) => plane.local_intersect(ray, object),
             Shapes::Sphere(sphere) => sphere.local_intersect(ray, object),
             Shapes::Test(test) => test.local_intersect(ray, object),
+            Shapes::Triangle(triangle) => triangle.local_intersect(ray, object),
         }
     }
 
@@ -60,6 +66,7 @@ impl Shapes {
             Shapes::Plane(plane) => plane.local_normal_at(point),
             Shapes::Sphere(sphere) => sphere.local_normal_at(point),
             Shapes::Test(test) => test.local_normal_at(point),
+            Shapes::Triangle(triangle) => triangle.local_normal_at(point),
         }
     }
 }
