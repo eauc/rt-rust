@@ -1,6 +1,7 @@
+use crate::bounds::Bounds;
 use crate::intersections::Intersection;
-use crate::objects::Object;
 use crate::matrices::Matrix;
+use crate::objects::Object;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
@@ -22,9 +23,18 @@ pub enum Shapes {
 }
 
 impl Shapes {
-    pub fn prepare(&mut self, world_to_object: &Matrix<4>, object_to_world: &Matrix<4>) {
+    pub fn prepare_bounds(&mut self, bounds: &mut Bounds) {
         match self {
-            Shapes::Group(group) => group.prepare(world_to_object, object_to_world),
+            Shapes::Cone(cone) => cone.prepare_bounds(bounds),
+            Shapes::Cylinder(cylinder) => cylinder.prepare_bounds(bounds),
+            Shapes::Group(group) => group.prepare_bounds(bounds),
+            Shapes::Plane(plane) => plane.prepare_bounds(bounds),
+            _ => (),
+        }
+    }
+    pub fn prepare_transform(&mut self, world_to_object: &Matrix<4>, object_to_world: &Matrix<4>) {
+        match self {
+            Shapes::Group(group) => group.prepare_transform(world_to_object, object_to_world),
             _ => (),
         }
     }

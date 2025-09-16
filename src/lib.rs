@@ -1,3 +1,4 @@
+pub mod bounds;
 pub mod cameras;
 pub mod canvas;
 pub mod colors;

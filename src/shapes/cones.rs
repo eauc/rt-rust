@@ -1,3 +1,4 @@
+use crate::bounds::Bounds;
 use crate::floats::{EPSILON, Float, equals};
 use crate::intersections::Intersection;
 use crate::objects::Object;
@@ -23,6 +24,11 @@ impl Cone {
         self.minimum = min;
         self.maximum = max;
         self.closed = closed;
+    }
+
+    pub fn prepare_bounds(&mut self, bounds: &mut Bounds) {
+        bounds.min = Tuple::point(-1.0, self.minimum, -1.0);
+        bounds.max = Tuple::point(1.0, self.maximum, 1.0);
     }
 
     pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {

@@ -1,3 +1,5 @@
+use crate::bounds::Bounds;
+use crate::floats::{EPSILON, Float};
 use crate::floats::equals;
 use crate::intersections::Intersection;
 use crate::objects::Object;
@@ -9,6 +11,11 @@ pub struct Plane;
 impl Plane {
     pub fn new() -> Plane {
         Plane
+    }
+
+    pub fn prepare_bounds(&mut self, bounds: &mut Bounds) {
+        bounds.min = Tuple::point(-Float::INFINITY, -EPSILON, -Float::INFINITY);
+        bounds.max = Tuple::point(Float::INFINITY, EPSILON, Float::INFINITY);
     }
 
     pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {

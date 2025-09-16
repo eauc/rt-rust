@@ -1,3 +1,5 @@
+use crate::bounds::Bounds;
+use crate::floats::Float;
 use crate::intersections::Intersection;
 use crate::matrices::Matrix;
 use crate::objects::Object;
@@ -17,7 +19,19 @@ impl Group {
         self.children.push(object);
     }
 
-    pub fn prepare(
+    pub fn prepare_bounds(&mut self, bounds: &mut Bounds) {
+        bounds.min = Tuple::point(Float::INFINITY, Float::INFINITY, Float::INFINITY);
+        bounds.max = Tuple::point(-Float::INFINITY, -Float::INFINITY, -Float::INFINITY);
+        for c in &mut self.children {
+            c.prepare_bounds();
+            let transformed_bounds = c.bounds.transform(&c.transform);
+            // println!("bounds: {:#?}\ntransformed_bounds: {:#?}\n", c.bounds, transformed_bounds);
+            bounds.merge(&transformed_bounds);
+        }
+        // println!("new bounds: {:#?}\n", bounds);
+    }
+
+    pub fn prepare_transform(
         &mut self,
         world_to_object: &Matrix<4>,
         object_to_world: &Matrix<4>,
@@ -25,11 +39,14 @@ impl Group {
         for c in &mut self.children {
             c.world_to_object = c.transform_inverse * *world_to_object;
             c.object_to_world = *object_to_world * c.transform_inverse.transpose();
-            c.prepare();
+            c.prepare_transform();
         }
     }
 
-    pub fn local_intersect<'b>(&'b self, ray: &Ray, _object: &'b Object) -> Vec<Intersection<'b>> {
+    pub fn local_intersect<'b>(&'b self, ray: &Ray, object: &'b Object) -> Vec<Intersection<'b>> {
+        if !object.bounds.intersect(ray) {
+            return vec![];
+        }
         let mut xs = self.children
             .iter()
             .flat_map(|c| c.intersect(ray))
@@ -79,6 +96,7 @@ mod tests {
         let mut g = Object::new_group().with_transform(scaling(2.0, 2.0, 2.0));
         let s = Object::new_sphere().with_transform(translation(5.0, 0.0, 0.0));
         g.as_mut_group().add_child(s);
+        g.prepare();
         let r = Ray::new(Tuple::point(10.0, 0.0, -10.0), Tuple::vector(0.0, 0.0, 1.0));
         let xs = g.intersect(&r);
         assert_eq!(xs.len(), 2);

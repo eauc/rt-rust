@@ -1,3 +1,4 @@
+use crate::bounds::Bounds;
 use crate::intersections::Intersection;
 use crate::materials::Material;
 use crate::matrices::Matrix;
@@ -17,6 +18,7 @@ pub struct Object {
     pub transform_inverse: Matrix<4>,
     pub world_to_object: Matrix<4>,
     pub object_to_world: Matrix<4>,
+    pub bounds: Bounds,
     shape: Shapes,
 }
 
@@ -28,6 +30,7 @@ impl Object {
             transform_inverse: Matrix::identity(),
             world_to_object: Matrix::identity(),
             object_to_world: Matrix::identity(),
+            bounds: Bounds::default(),
             shape,
         }
     }
@@ -124,7 +127,14 @@ impl Object {
     }
 
     pub fn prepare(&mut self) {
-        self.shape.prepare(&self.world_to_object, &self.object_to_world);
+        self.prepare_bounds();
+        self.prepare_transform();
+    }
+    pub fn prepare_bounds(&mut self) {
+        self.shape.prepare_bounds(&mut self.bounds);
+    }
+    pub fn prepare_transform(&mut self) {
+        self.shape.prepare_transform(&self.world_to_object, &self.object_to_world);
     }
 
     pub fn world_to_object(&self, world_point: Tuple) -> Tuple {
