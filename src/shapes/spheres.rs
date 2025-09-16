@@ -1,4 +1,5 @@
-use crate::floats::Float;
+use crate::intersections::Intersection;
+use crate::objects::Object;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
@@ -9,7 +10,7 @@ impl Sphere {
         Sphere
     }
 
-    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Float> {
+    pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {
         let sphere_to_ray = ray.origin - Tuple::point(0.0, 0.0, 0.0);
         let a = ray.direction.dot(ray.direction);
         let b = 2.0 * ray.direction.dot(sphere_to_ray);
@@ -20,7 +21,7 @@ impl Sphere {
         }
         let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
         let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
-        vec![t1, t2]
+        vec![Intersection::new(t1, object), Intersection::new(t2, object)]
     }
 
     pub fn local_normal_at(&self, local_point: Tuple) -> Tuple {
@@ -35,41 +36,41 @@ mod tests {
     #[test]
     fn a_ray_intersects_a_sphere_at_two_points() {
         let r = Ray::new(Tuple::point(0.0, 0.0, -5.0), Tuple::vector(0.0, 0.0, 1.0));
-        let s = Sphere::new();
-        let xs = s.local_intersect(&r);
-        assert_eq!(xs, vec![4.0, 6.0]);
+        let s = Object::new_sphere();
+        let xs = s.as_sphere().local_intersect(&r, &s);
+        assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![4.0, 6.0]);
     }
 
     #[test]
     fn a_ray_intersects_a_sphere_at_a_tangent() {
         let r = Ray::new(Tuple::point(0.0, 1.0, -5.0), Tuple::vector(0.0, 0.0, 1.0));
-        let s = Sphere::new();
-        let xs = s.local_intersect(&r);
-        assert_eq!(xs, vec![5.0, 5.0]);
+        let s = Object::new_sphere();
+        let xs = s.as_sphere().local_intersect(&r, &s);
+        assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![5.0, 5.0]);
     }
 
     #[test]
     fn a_ray_misses_a_sphere() {
         let r = Ray::new(Tuple::point(0.0, 2.0, -5.0), Tuple::vector(0.0, 0.0, 1.0));
-        let s = Sphere::new();
-        let xs = s.local_intersect(&r);
+        let s = Object::new_sphere();
+        let xs = s.as_sphere().local_intersect(&r, &s);
         assert_eq!(xs.len(), 0);
     }
 
     #[test]
     fn a_ray_originates_inside_a_sphere() {
         let r = Ray::new(Tuple::point(0.0, 0.0, 0.0), Tuple::vector(0.0, 0.0, 1.0));
-        let s = Sphere::new();
-        let xs = s.local_intersect(&r);
-        assert_eq!(xs, vec![-1.0, 1.0]);
+        let s = Object::new_sphere();
+        let xs = s.as_sphere().local_intersect(&r, &s);
+        assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![-1.0, 1.0]);
     }
 
     #[test]
     fn a_sphere_is_behind_a_ray() {
         let r = Ray::new(Tuple::point(0.0, 0.0, 5.0), Tuple::vector(0.0, 0.0, 1.0));
-        let s = Sphere::new();
-        let xs = s.local_intersect(&r);
-        assert_eq!(xs, vec![-6.0, -4.0]);
+        let s = Object::new_sphere();
+        let xs = s.as_sphere().local_intersect(&r, &s);
+        assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![-6.0, -4.0]);
     }
 
     #[test]
@@ -96,13 +97,11 @@ mod tests {
     #[test]
     fn the_normal_on_a_sphere_at_a_nonaxial_point() {
         let s = Sphere::new();
-        let n = s.local_normal_at(
-            Tuple::point(
-                (3.0_f32).sqrt() / 3.0,
-                (3.0_f32).sqrt() / 3.0,
-                (3.0_f32).sqrt() / 3.0,
-            ),
-        );
+        let n = s.local_normal_at(Tuple::point(
+            (3.0_f32).sqrt() / 3.0,
+            (3.0_f32).sqrt() / 3.0,
+            (3.0_f32).sqrt() / 3.0,
+        ));
         assert_eq!(
             n,
             Tuple::vector(
@@ -116,13 +115,11 @@ mod tests {
     #[test]
     fn the_normal_is_a_normalized_vector() {
         let s = Sphere::new();
-        let n = s.local_normal_at(
-            Tuple::point(
-                (3.0_f32).sqrt() / 3.0,
-                (3.0_f32).sqrt() / 3.0,
-                (3.0_f32).sqrt() / 3.0,
-            ),
-        );
+        let n = s.local_normal_at(Tuple::point(
+            (3.0_f32).sqrt() / 3.0,
+            (3.0_f32).sqrt() / 3.0,
+            (3.0_f32).sqrt() / 3.0,
+        ));
         assert_eq!(n, n.normalize());
     }
 }

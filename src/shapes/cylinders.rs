@@ -1,4 +1,6 @@
-use crate::floats::{Float, EPSILON, equals};
+use crate::floats::{EPSILON, Float, equals};
+use crate::intersections::Intersection;
+use crate::objects::Object;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
@@ -16,11 +18,16 @@ impl Cylinder {
             maximum: Float::INFINITY,
         }
     }
-    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Float> {
+    pub fn truncate(&mut self, min: Float, max: Float, closed: bool) {
+        self.minimum = min;
+        self.maximum = max;
+        self.closed = closed;
+    }
+    pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {
         let mut xs = vec![];
         self.intersect_sides(ray, &mut xs);
         self.intersect_caps(ray, &mut xs);
-        xs
+        xs.iter().map(|t| Intersection::new(*t, object)).collect()
     }
     pub fn local_normal_at(&self, local_point: Tuple) -> Tuple {
         let dist = local_point.x().powi(2) + local_point.z().powi(2);
@@ -83,7 +90,7 @@ mod tests {
 
     #[test]
     fn a_ray_misses_a_cylinder() {
-        let cyl = Cylinder::new();
+        let cyl = Object::new_cylinder();
         let origins = vec![
             Tuple::point(1.0, 0.0, 0.0),
             Tuple::point(0.0, 0.0, 0.0),
@@ -96,14 +103,14 @@ mod tests {
         ];
         for (origin, direction) in origins.iter().zip(directions.iter()) {
             let r = Ray::new(*origin, *direction);
-            let xs = cyl.local_intersect(&r);
+            let xs = cyl.as_cylinder().local_intersect(&r, &cyl);
             assert_eq!(xs.len(), 0);
         }
     }
 
     #[test]
     fn a_ray_strikes_a_cylinder() {
-        let cyl = Cylinder::new();
+        let cyl = Object::new_cylinder();
         let origins = vec![
             Tuple::point(1.0, 0.0, -5.0),
             Tuple::point(0.0, 0.0, -5.0),
@@ -117,8 +124,8 @@ mod tests {
         let results = vec![vec![5.0, 5.0], vec![4.0, 6.0], vec![4.801988, 4.999992]];
         for i in 0..origins.len() {
             let r = Ray::new(origins[i], directions[i]);
-            let xs = cyl.local_intersect(&r);
-            assert_eq!(xs, results[i]);
+            let xs = cyl.as_cylinder().local_intersect(&r, &cyl);
+            assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), results[i]);
         }
     }
 
@@ -152,9 +159,9 @@ mod tests {
 
     #[test]
     fn intersecting_a_constrained_cylinder() {
-        let mut cyl = Cylinder::new();
-        cyl.minimum = 1.0;
-        cyl.maximum = 2.0;
+        let mut cyl = Object::new_cylinder();
+        cyl.as_mut_cylinder().minimum = 1.0;
+        cyl.as_mut_cylinder().maximum = 2.0;
         let points = vec![
             Tuple::point(0.0, 1.5, 0.0),
             Tuple::point(0.0, 3.0, -5.0),
@@ -174,7 +181,7 @@ mod tests {
         let counts = vec![0, 0, 0, 0, 0, 2];
         for i in 0..points.len() {
             let r = Ray::new(points[i], directions[i].normalize());
-            let xs = cyl.local_intersect(&r);
+            let xs = cyl.as_cylinder().local_intersect(&r, &cyl);
             assert_eq!(xs.len(), counts[i]);
         }
     }
@@ -187,10 +194,10 @@ mod tests {
 
     #[test]
     fn intersecting_the_caps_of_a_closed_cylinder() {
-        let mut cyl = Cylinder::new();
-        cyl.minimum = 1.0;
-        cyl.maximum = 2.0;
-        cyl.closed = true;
+        let mut cyl = Object::new_cylinder();
+        cyl.as_mut_cylinder().minimum = 1.0;
+        cyl.as_mut_cylinder().maximum = 2.0;
+        cyl.as_mut_cylinder().closed = true;
         let points = vec![
             Tuple::point(0.0, 3.0, 0.0),
             Tuple::point(0.0, 3.0, -2.0),
@@ -208,7 +215,7 @@ mod tests {
         let counts = vec![2, 2, 2, 2, 2];
         for i in 0..points.len() {
             let r = Ray::new(points[i], directions[i].normalize());
-            let xs = cyl.local_intersect(&r);
+            let xs = cyl.as_cylinder().local_intersect(&r, &cyl);
             assert_eq!(xs.len(), counts[i]);
         }
     }

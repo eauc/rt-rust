@@ -46,7 +46,7 @@ impl Pattern {
     }
 
     pub fn color_at_object(&self, object: &Object, world_point: Tuple) -> Color {
-        let object_point = object.transform_inverse * world_point;
+        let object_point = object.world_to_object(world_point);
         let pattern_point = self.transform_inverse * object_point;
         self.pattern.color_at(pattern_point)
     }

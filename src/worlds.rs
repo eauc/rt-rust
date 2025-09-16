@@ -18,6 +18,12 @@ impl World {
         }
     }
 
+    pub fn prepare(&mut self) {
+        for o in &mut self.objects {
+            o.prepare();
+        }
+    }
+
     fn intersect<'a>(&'a self, ray: &Ray) -> Vec<Intersection<'a>> {
         let mut intersections = self
             .objects

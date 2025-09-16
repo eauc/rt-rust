@@ -51,7 +51,7 @@ fn main() {
         ),
     );
 
-    let image = camera.render(&world, 5);
+    let image = camera.render(&mut world, 5);
     let ppm = image.to_ppm();
     std::fs::write("examples/reflection.ppm", ppm).unwrap();
 }

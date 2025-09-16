@@ -1,7 +1,7 @@
 pub mod cameras;
 pub mod canvas;
 pub mod colors;
-mod floats;
+pub mod floats;
 pub mod intersections;
 pub mod lights;
 pub mod materials;

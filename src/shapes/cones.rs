@@ -1,4 +1,6 @@
-use crate::floats::{Float, EPSILON, equals};
+use crate::floats::{EPSILON, Float, equals};
+use crate::intersections::Intersection;
+use crate::objects::Object;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
@@ -17,11 +19,17 @@ impl Cone {
         }
     }
 
-    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Float> {
+    pub fn truncate(&mut self, min: Float, max: Float, closed: bool) {
+        self.minimum = min;
+        self.maximum = max;
+        self.closed = closed;
+    }
+
+    pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {
         let mut xs = vec![];
         self.intersect_sides(ray, &mut xs);
         self.intersect_caps(ray, &mut xs);
-        xs
+        xs.iter().map(|t| Intersection::new(*t, object)).collect()
     }
 
     pub fn local_normal_at(&self, local_point: Tuple) -> Tuple {
@@ -93,7 +101,7 @@ mod tests {
 
     #[test]
     fn intersecting_a_cone_with_a_ray() {
-        let shape = Cone::new();
+        let shape = Object::new_cone();
         let origins = vec![
             Tuple::point(0.0, 0.0, -5.0),
             Tuple::point(0.0, 0.0, -5.0),
@@ -111,28 +119,28 @@ mod tests {
         ];
         for i in 0..origins.len() {
             let r = Ray::new(origins[i], directions[i].normalize());
-            let xs = shape.local_intersect(&r);
-            assert_eq!(xs, results[i]);
+            let xs = shape.as_cone().local_intersect(&r, &shape);
+            assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), results[i]);
         }
     }
 
     #[test]
     fn intersecting_a_cone_with_a_ray_parallel_to_one_of_its_halves() {
-        let shape = Cone::new();
+        let shape = Object::new_cone();
         let r = Ray::new(
             Tuple::point(0.0, 0.0, -1.0),
             Tuple::vector(0.0, 1.0, 1.0).normalize(),
         );
-        let xs = shape.local_intersect(&r);
-        assert_eq!(xs, vec![0.35355338]);
+        let xs = shape.as_cone().local_intersect(&r, &shape);
+        assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![0.35355338]);
     }
 
     #[test]
     fn intersecting_a_cone_end_caps() {
-        let mut shape = Cone::new();
-        shape.minimum = -0.5;
-        shape.maximum = 0.5;
-        shape.closed = true;
+        let mut shape = Object::new_cone();
+        shape.as_mut_cone().minimum = -0.5;
+        shape.as_mut_cone().maximum = 0.5;
+        shape.as_mut_cone().closed = true;
         let origins = vec![
             Tuple::point(0.0, 0.0, -5.0),
             Tuple::point(0.0, 0.0, -0.25),
@@ -146,7 +154,7 @@ mod tests {
         let counts = vec![0, 2, 4];
         for i in 0..origins.len() {
             let r = Ray::new(origins[i], directions[i].normalize());
-            let xs = shape.local_intersect(&r);
+            let xs = shape.as_cone().local_intersect(&r, &shape);
             assert_eq!(xs.len(), counts[i]);
         }
     }

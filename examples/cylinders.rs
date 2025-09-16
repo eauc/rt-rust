@@ -16,19 +16,21 @@ fn main() {
 
     let mut middle = Object::new_cylinder().with_transform(translation(0.0, 0.0, 0.0));
     middle.material.color = Color::new(1.0, 0.5, 0.2);
-    let mut left = Object::new_cylinder_truncated(-1.0, 1.0, true).with_transform(
+    let mut left = Object::new_cylinder().with_transform(
         translation(5.0, 0.0, 0.0)
             * scaling(0.5, 0.5, 0.5)
             * rotation_y(PI / 6.0)
             * rotation_z(PI / 4.0),
     );
+    left.as_mut_cylinder().truncate(-1.0, 1.0, true);
     left.material.color = Color::new(0.2, 0.5, 1.0);
-    let mut right = Object::new_cylinder_truncated(-1.0, 1.0, false).with_transform(
+    let mut right = Object::new_cylinder().with_transform(
         translation(0.0, 0.0, 5.0)
             * scaling(0.65, 0.65, 0.65)
             * rotation_y(-2.0 * PI / 3.0)
             * rotation_z(PI / 6.0),
     );
+    right.as_mut_cylinder().truncate(-1.0, 1.0, false);
     right.material.color = Color::new(0.2, 1.0, 0.5);
 
     let light = PointLight::new(Tuple::point(10.0, 10.0, 2.0), Color::new(1.0, 1.0, 1.0));
@@ -46,7 +48,7 @@ fn main() {
         ),
     );
 
-    let image = camera.render(&world, 5);
+    let image = camera.render(&mut world, 5);
     let ppm = image.to_ppm();
     std::fs::write("examples/cylinders.ppm", ppm).unwrap();
 }

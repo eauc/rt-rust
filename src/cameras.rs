@@ -49,7 +49,8 @@ impl Camera {
         return Ray::new(origin, direction);
     }
 
-    pub fn render(&self, world: &World, depth: u32) -> Canvas {
+    pub fn render(&self, world: &mut World, depth: u32) -> Canvas {
+        world.prepare();
         let mut image = Canvas::new(self.hsize, self.vsize);
         for y in 0..self.vsize {
             for x in 0..self.hsize {
@@ -126,12 +127,12 @@ mod tests {
 
     #[test]
     fn rendering_a_world_with_a_camera() {
-        let w = default_world();
+        let mut w = default_world();
         let from = Tuple::point(0.0, 0.0, -5.0);
         let to = Tuple::point(0.0, 0.0, 0.0);
         let up = Tuple::vector(0.0, 1.0, 0.0);
         let c = Camera::new(11, 11, PI / 2.0, view_transform(from, to, up));
-        let image = c.render(&w, 1);
+        let image = c.render(&mut w, 1);
         assert_eq!(image.pixel_at(5, 5), Color::new(0.38066, 0.47583, 0.2855));
     }
 }

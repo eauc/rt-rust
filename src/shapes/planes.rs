@@ -1,5 +1,6 @@
-use crate::floats::Float;
 use crate::floats::equals;
+use crate::intersections::Intersection;
+use crate::objects::Object;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
@@ -10,12 +11,12 @@ impl Plane {
         Plane
     }
 
-    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Float> {
+    pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {
         if equals(ray.direction.y(), 0.0) {
             return vec![];
         }
         let t = -ray.origin.y() / ray.direction.y();
-        vec![t]
+        vec![Intersection::new(t, object)]
     }
 
     pub fn local_normal_at(&self, _point: Tuple) -> Tuple {
@@ -41,33 +42,33 @@ mod tests {
 
     #[test]
     fn intersect_with_a_ray_parallel_to_the_plane() {
-        let p = Plane::new();
         let r = Ray::new(Tuple::point(0.0, 10.0, 0.0), Tuple::vector(0.0, 0.0, 1.0));
-        let xs = p.local_intersect(&r);
+        let p = Object::new_plane();
+        let xs = p.as_plane().local_intersect(&r, &p);
         assert_eq!(xs.len(), 0);
     }
 
     #[test]
     fn intersect_with_a_ray_coplanar_to_the_plane() {
-        let p = Plane::new();
         let r = Ray::new(Tuple::point(0.0, 0.0, 0.0), Tuple::vector(0.0, 0.0, 1.0));
-        let xs = p.local_intersect(&r);
+        let p = Object::new_plane();
+        let xs = p.as_plane().local_intersect(&r, &p);
         assert_eq!(xs.len(), 0);
     }
 
     #[test]
     fn a_ray_intersecting_a_plane_from_above() {
-        let p = Plane::new();
         let r = Ray::new(Tuple::point(0.0, 1.0, 0.0), Tuple::vector(0.0, -1.0, 0.0));
-        let xs = p.local_intersect(&r);
-        assert_eq!(xs, vec![1.0]);
+        let p = Object::new_plane();
+        let xs = p.as_plane().local_intersect(&r, &p);
+        assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![1.0]);
     }
 
     #[test]
     fn a_ray_intersecting_a_plane_from_below() {
-        let p = Plane::new();
         let r = Ray::new(Tuple::point(0.0, -1.0, 0.0), Tuple::vector(0.0, 1.0, 0.0));
-        let xs = p.local_intersect(&r);
-        assert_eq!(xs, vec![1.0]);
+        let p = Object::new_plane();
+        let xs = p.as_plane().local_intersect(&r, &p);
+        assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![1.0]);
     }
 }

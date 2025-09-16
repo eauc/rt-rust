@@ -48,7 +48,7 @@ fn main() {
         ),
     );
 
-    let image = camera.render(&world, 0);
+    let image = camera.render(&mut world, 0);
     let ppm = image.to_ppm();
     std::fs::write("examples/patterns.ppm", ppm).unwrap();
 }

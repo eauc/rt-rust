@@ -1,4 +1,6 @@
-use crate::floats::{Float, EPSILON};
+use crate::floats::{EPSILON, Float};
+use crate::intersections::Intersection;
+use crate::objects::Object;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
@@ -9,7 +11,7 @@ impl Cube {
         Cube
     }
 
-    pub fn local_intersect<'a>(&'a self, ray: &Ray) -> Vec<Float> {
+    pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {
         let (xtmin, xtmax) = check_axis(ray.origin.x(), ray.direction.x());
         let (ytmin, ytmax) = check_axis(ray.origin.y(), ray.direction.y());
         let (ztmin, ztmax) = check_axis(ray.origin.z(), ray.direction.z());
@@ -18,7 +20,10 @@ impl Cube {
         if tmin > tmax {
             return vec![];
         }
-        vec![tmin, tmax]
+        vec![
+            Intersection::new(tmin, object),
+            Intersection::new(tmax, object),
+        ]
     }
 
     pub fn local_normal_at(&self, local_point: Tuple) -> Tuple {
@@ -63,7 +68,7 @@ mod tests {
 
     #[test]
     fn a_ray_intersects_a_cube() {
-        let c = Cube::new();
+        let c = Object::new_cube();
         let origins = vec![
             Tuple::point(5.0, 0.5, 0.0),
             Tuple::point(-5.0, 0.5, 0.0),
@@ -93,15 +98,15 @@ mod tests {
         ];
         for i in 0..origins.len() {
             let r = Ray::new(origins[i], directions[i]);
-            let xs = c.local_intersect(&r);
+            let xs = c.as_cube().local_intersect(&r, &c);
             // println!("{:?} {:?}", origins[i], directions[i]);
-            assert_eq!(xs, results[i]);
+            assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), results[i]);
         }
     }
 
     #[test]
     fn a_ray_misses_a_cube() {
-        let c = Cube::new();
+        let c = Object::new_cube();
         let origins = vec![
             Tuple::point(-2.0, 0.0, 0.0),
             Tuple::point(0.0, -2.0, 0.0),
@@ -120,7 +125,7 @@ mod tests {
         ];
         for i in 0..origins.len() {
             let r = Ray::new(origins[i], directions[i]);
-            let xs = c.local_intersect(&r);
+            let xs = c.as_cube().local_intersect(&r, &c);
             assert_eq!(xs.len(), 0);
         }
     }

@@ -1,4 +1,3 @@
-use crate::floats::Float;
 use crate::intersections::Intersection;
 use crate::materials::Material;
 use crate::matrices::Matrix;
@@ -7,14 +6,17 @@ use crate::shapes::Shapes;
 use crate::shapes::cones::Cone;
 use crate::shapes::cubes::Cube;
 use crate::shapes::cylinders::Cylinder;
+use crate::shapes::groups::Group;
 use crate::shapes::planes::Plane;
 use crate::shapes::spheres::Sphere;
 use crate::tuples::Tuple;
 
 pub struct Object {
     pub material: Material,
+    pub transform: Matrix<4>,
     pub transform_inverse: Matrix<4>,
-    transform_inverse_transpose: Matrix<4>,
+    pub world_to_object: Matrix<4>,
+    pub object_to_world: Matrix<4>,
     shape: Shapes,
 }
 
@@ -22,20 +24,15 @@ impl Object {
     fn new(shape: Shapes) -> Object {
         Object {
             material: Material::default(),
+            transform: Matrix::identity(),
             transform_inverse: Matrix::identity(),
-            transform_inverse_transpose: Matrix::identity(),
+            world_to_object: Matrix::identity(),
+            object_to_world: Matrix::identity(),
             shape,
         }
     }
     pub fn new_cone() -> Object {
         Object::new(Shapes::Cone(Cone::new()))
-    }
-    pub fn new_cone_truncated(min: Float, max: Float, closed: bool) -> Object {
-        let mut cone = Cone::new();
-        cone.minimum = min;
-        cone.maximum = max;
-        cone.closed = closed;
-        Object::new(Shapes::Cone(cone))
     }
     pub fn new_cube() -> Object {
         Object::new(Shapes::Cube(Cube::new()))
@@ -43,18 +40,69 @@ impl Object {
     pub fn new_cylinder() -> Object {
         Object::new(Shapes::Cylinder(Cylinder::new()))
     }
-    pub fn new_cylinder_truncated(min: Float, max: Float, closed: bool) -> Object {
-        let mut cylinder = Cylinder::new();
-        cylinder.minimum = min;
-        cylinder.maximum = max;
-        cylinder.closed = closed;
-        Object::new(Shapes::Cylinder(cylinder))
+    pub fn new_group() -> Object {
+        Object::new(Shapes::Group(Group::new()))
     }
     pub fn new_plane() -> Object {
         Object::new(Shapes::Plane(Plane::new()))
     }
     pub fn new_sphere() -> Object {
         Object::new(Shapes::Sphere(Sphere::new()))
+    }
+
+    pub fn as_cone(&self) -> &Cone {
+        match &self.shape {
+            Shapes::Cone(cone) => cone,
+            _ => panic!("This object is not a cone !"),
+        }
+    }
+    pub fn as_mut_cone(&mut self) -> &mut Cone {
+        match &mut self.shape {
+            Shapes::Cone(cone) => cone,
+            _ => panic!("This object is not a cone !"),
+        }
+    }
+    pub fn as_cube(&self) -> &Cube {
+        match &self.shape {
+            Shapes::Cube(cube) => cube,
+            _ => panic!("This object is not a cube !"),
+        }
+    }
+    pub fn as_cylinder(&self) -> &Cylinder {
+        match &self.shape {
+            Shapes::Cylinder(cylinder) => cylinder,
+            _ => panic!("This object is not a cylinder !"),
+        }
+    }
+    pub fn as_mut_cylinder(&mut self) -> &mut Cylinder {
+        match &mut self.shape {
+            Shapes::Cylinder(cylinder) => cylinder,
+            _ => panic!("This object is not a cylinder !"),
+        }
+    }
+    pub fn as_group(&self) -> &Group {
+        match &self.shape {
+            Shapes::Group(group) => group,
+            _ => panic!("This object is not a group !"),
+        }
+    }
+    pub fn as_mut_group(&mut self) -> &mut Group {
+        match &mut self.shape {
+            Shapes::Group(group) => group,
+            _ => panic!("This object is not a group !"),
+        }
+    }
+    pub fn as_plane(&self) -> &Plane {
+        match &self.shape {
+            Shapes::Plane(plane) => plane,
+            _ => panic!("This object is not a plane !"),
+        }
+    }
+    pub fn as_sphere(&self) -> &Sphere {
+        match &self.shape {
+            Shapes::Sphere(sphere) => sphere,
+            _ => panic!("This object is not a sphere !"),
+        }
     }
 
     pub fn made_of_glass(self) -> Object {
@@ -67,27 +115,37 @@ impl Object {
     pub fn with_transform(self, transform: Matrix<4>) -> Object {
         let transform_inverse = transform.inverse();
         Object {
+            transform,
             transform_inverse,
-            transform_inverse_transpose: transform_inverse.transpose(),
+            world_to_object: transform_inverse,
+            object_to_world: transform_inverse.transpose(),
             ..self
         }
     }
 
-    pub fn intersect<'a>(&'a self, ray: &Ray) -> Vec<Intersection<'a>> {
+    pub fn prepare(&mut self) {
+        self.shape.prepare(&self.world_to_object, &self.object_to_world);
+    }
+
+    pub fn world_to_object(&self, world_point: Tuple) -> Tuple {
+        self.world_to_object * world_point
+    }
+
+    pub fn normal_to_world(&self, object_normal: Tuple) -> Tuple {
+        let mut n = self.object_to_world * object_normal;
+        n.to_vector();
+        n.normalize()
+    }
+
+    pub fn intersect<'b>(&'b self, ray: &Ray) -> Vec<Intersection<'b>> {
         let local_ray = ray.transform(self.transform_inverse);
-        self.shape
-            .local_intersect(&local_ray)
-            .iter()
-            .map(|t| Intersection::new(*t, self))
-            .collect()
+        self.shape.local_intersect(&local_ray, self)
     }
 
     pub fn normal_at(&self, world_point: Tuple) -> Tuple {
-        let local_point = self.transform_inverse * world_point;
+        let local_point = self.world_to_object(world_point);
         let local_normal = self.shape.local_normal_at(local_point);
-        let mut world_normal = self.transform_inverse_transpose * local_normal;
-        world_normal.to_vector();
-        world_normal.normalize()
+        self.normal_to_world(local_normal)
     }
 }
 
@@ -95,7 +153,8 @@ impl Object {
 mod tests {
     use super::*;
     use crate::shapes::TestShape;
-    use crate::transformations::{scaling, translation};
+    use crate::transformations::{rotation_y, scaling, translation};
+    use std::f32::consts::PI;
 
     fn new_test() -> Object {
         Object::new(Shapes::Test(TestShape))
@@ -132,5 +191,48 @@ mod tests {
         let o = new_test().with_transform(translation(0.0, 1.0, 0.0));
         let n = o.normal_at(Tuple::point(0.0, 1.70711, -0.70711));
         assert_eq!(n, Tuple::vector(0.0, 0.70711, -0.70711));
+    }
+
+    #[test]
+    fn converting_a_point_from_world_to_object_space() {
+        let s = Object::new_sphere().with_transform(translation(5.0, 0.0, 0.0));
+        let mut g2 = Object::new_group().with_transform(scaling(2.0, 2.0, 2.0));
+        g2.as_mut_group().add_child(s);
+        let mut g1 = Object::new_group().with_transform(rotation_y(PI / 2.0));
+        g1.as_mut_group().add_child(g2);
+        g1.prepare();
+        let s = &g1.as_group().children[0].as_group().children[0];
+        let p = s.world_to_object(Tuple::point(-2.0, 0.0, -10.0));
+        assert_eq!(p, Tuple::point(0.0, 0.0, -1.0));
+    }
+
+    #[test]
+    fn converting_a_normal_from_object_to_world_space() {
+        let s = Object::new_sphere().with_transform(translation(5.0, 0.0, 0.0));
+        let mut g2 = Object::new_group().with_transform(scaling(1.0, 2.0, 3.0));
+        g2.as_mut_group().add_child(s);
+        let mut g1 = Object::new_group().with_transform(rotation_y(PI / 2.0));
+        g1.as_mut_group().add_child(g2);
+        g1.prepare();
+        let s = &g1.as_group().children[0].as_group().children[0];
+        let v = s.normal_to_world(Tuple::vector(
+            (3.0_f32).sqrt() / 3.0,
+            (3.0_f32).sqrt() / 3.0,
+            (3.0_f32).sqrt() / 3.0,
+        ));
+        assert_eq!(v, Tuple::vector(0.28571427, 0.42857143, -0.8571));
+    }
+
+    #[test]
+    fn finding_the_normal_on_a_child_object() {
+        let s = Object::new_sphere().with_transform(translation(5.0, 0.0, 0.0));
+        let mut g2 = Object::new_group().with_transform(scaling(1.0, 2.0, 3.0));
+        g2.as_mut_group().add_child(s);
+        let mut g1 = Object::new_group().with_transform(rotation_y(PI / 2.0));
+        g1.as_mut_group().add_child(g2);
+        g1.prepare();
+        let s = &g1.as_group().children[0].as_group().children[0];
+        let v = s.normal_at(Tuple::point(1.7321, 1.1547, -5.5774));
+        assert_eq!(v, Tuple::vector(0.28571427, 0.42857143, -0.8571));
     }
 }
