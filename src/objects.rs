@@ -10,6 +10,7 @@ use crate::shapes::cylinders::Cylinder;
 use crate::shapes::groups::Group;
 use crate::shapes::planes::Plane;
 use crate::shapes::spheres::Sphere;
+use crate::shapes::smooth_triangles::SmoothTriangle;
 use crate::shapes::triangles::Triangle;
 use crate::tuples::Tuple;
 
@@ -52,6 +53,9 @@ impl Object {
     }
     pub fn new_sphere() -> Object {
         Object::new(Shapes::Sphere(Sphere::new()))
+    }
+    pub fn new_smooth_triangle(p1: Tuple, p2: Tuple, p3: Tuple, n1: Tuple, n2: Tuple, n3: Tuple) -> Object {
+        Object::new(Shapes::SmoothTriangle(SmoothTriangle::new(p1, p2, p3, n1, n2, n3)))
     }
     pub fn new_triangle(p1: Tuple, p2: Tuple, p3: Tuple) -> Object {
         Object::new(Shapes::Triangle(Triangle::new(p1, p2, p3)))
@@ -111,6 +115,12 @@ impl Object {
             _ => panic!("This object is not a sphere !"),
         }
     }
+    pub fn as_smooth_triangle(&self) -> &SmoothTriangle {
+        match &self.shape {
+            Shapes::SmoothTriangle(triangle) => triangle,
+            _ => panic!("This object is not a triangle !"),
+        }
+    }
     pub fn as_triangle(&self) -> &Triangle {
         match &self.shape {
             Shapes::Triangle(triangle) => triangle,
@@ -162,9 +172,9 @@ impl Object {
         self.shape.local_intersect(&local_ray, self)
     }
 
-    pub fn normal_at(&self, world_point: Tuple) -> Tuple {
+    pub fn normal_at(&self, world_point: Tuple, hit: &Intersection) -> Tuple {
         let local_point = self.world_to_object(world_point);
-        let local_normal = self.shape.local_normal_at(local_point);
+        let local_normal = self.shape.local_normal_at(local_point, hit);
         self.normal_to_world(local_normal)
     }
 }
@@ -209,7 +219,8 @@ mod tests {
     #[test]
     fn computing_the_normal_on_a_translated_shape() {
         let o = new_test().with_transform(translation(0.0, 1.0, 0.0));
-        let n = o.normal_at(Tuple::point(0.0, 1.70711, -0.70711));
+        let hit = Intersection::new(0.0, &o);
+        let n = o.normal_at(Tuple::point(0.0, 1.70711, -0.70711), &hit);
         assert_eq!(n, Tuple::vector(0.0, 0.70711, -0.70711));
     }
 
@@ -252,7 +263,8 @@ mod tests {
         g1.as_mut_group().add_child(g2);
         g1.prepare();
         let s = &g1.as_group().children[0].as_group().children[0];
-        let v = s.normal_at(Tuple::point(1.7321, 1.1547, -5.5774));
+        let hit = Intersection::new(0.0, s);
+        let v = s.normal_at(Tuple::point(1.7321, 1.1547, -5.5774), &hit);
         assert_eq!(v, Tuple::vector(0.28571427, 0.42857143, -0.8571));
     }
 }

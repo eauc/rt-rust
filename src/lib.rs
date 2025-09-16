@@ -7,6 +7,7 @@ pub mod intersections;
 pub mod lights;
 pub mod materials;
 pub mod matrices;
+pub mod obj_files;
 pub mod objects;
 pub mod patterns;
 pub mod rays;

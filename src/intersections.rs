@@ -1,4 +1,4 @@
-use crate::floats::{Float, EPSILON};
+use crate::floats::{EPSILON, Float};
 use crate::objects::Object;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
@@ -6,6 +6,8 @@ use std::ptr;
 
 pub struct Intersection<'a> {
     pub t: Float,
+    pub u: Float,
+    pub v: Float,
     pub object: &'a Object,
 }
 
@@ -23,7 +25,16 @@ pub struct IntersectionComputations {
 
 impl<'a> Intersection<'a> {
     pub fn new(t: Float, object: &'a Object) -> Intersection<'a> {
-        Intersection { t, object }
+        Intersection {
+            t,
+            u: 0.0,
+            v: 0.0,
+            object,
+        }
+    }
+
+    pub fn new_with_uv(t: Float, object: &'a Object, u: Float, v: Float) -> Intersection<'a> {
+        Intersection { t, u, v, object }
     }
 
     pub fn prepare_computations(
@@ -33,7 +44,7 @@ impl<'a> Intersection<'a> {
     ) -> IntersectionComputations {
         let point = ray.position(self.t);
         let eyev = -ray.direction;
-        let normalv = self.object.normal_at(point);
+        let normalv = self.object.normal_at(point, self);
         let inside = normalv.dot(eyev) < 0.0;
         let normalv = if inside { -normalv } else { normalv };
         let over_point = point + normalv * EPSILON;
@@ -305,5 +316,17 @@ mod tests {
         let comps = xs[0].prepare_computations(&r, &xs);
         let reflectance = schlick(&comps);
         assert_eq!(reflectance, 0.48873067);
+    }
+
+    #[test]
+    fn an_intersection_can_encapsulate_u_and_v() {
+        let s = Object::new_triangle(
+            Tuple::point(0.0, 1.0, 0.0),
+            Tuple::point(-1.0, 0.0, 0.0),
+            Tuple::point(1.0, 0.0, 0.0),
+        );
+        let i = Intersection::new_with_uv(3.5, &s, 0.2, 0.4);
+        assert_eq!(i.u, 0.2);
+        assert_eq!(i.v, 0.4);
     }
 }
