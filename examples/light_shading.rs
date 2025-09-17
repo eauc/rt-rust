@@ -1,5 +1,5 @@
 use rt_rust::canvas::Canvas;
-use rt_rust::colors::Color;
+use rt_rust::colors::{Color, WHITE};
 use rt_rust::intersections;
 use rt_rust::lights::PointLight;
 use rt_rust::objects::Object;
@@ -16,7 +16,7 @@ fn main() {
     let mut canvas = Canvas::new(canvas_pixel, canvas_pixel);
     let mut sphere = Object::new_sphere();
     sphere.material.color = Color::new(1.0, 0.2, 1.0);
-    let light = PointLight::new(Tuple::point(-10.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
+    let light = PointLight::new(Tuple::point(-10.0, 10.0, -10.0), WHITE);
     for y in 0..canvas_pixel {
         let world_y = half - pixel_size * y as f32;
         for x in 0..canvas_pixel {
@@ -28,9 +28,14 @@ fn main() {
                 let hit_point = ray.position(hit.t);
                 let normalv = hit.object.normal_at(hit_point, hit);
                 let eyev = -ray.direction;
-                let color = sphere
-                    .material
-                    .lighting(&sphere, &light, hit_point, eyev, normalv, false);
+                let color = sphere.material.lighting(
+                    &sphere,
+                    WHITE,
+                    &vec![light],
+                    hit_point,
+                    eyev,
+                    normalv,
+                );
                 canvas.write_pixel(x, y, color);
             }
         }

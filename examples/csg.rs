@@ -25,7 +25,8 @@ fn main() {
     let csg = Object::new_csg(Operation::Difference, c3, c2);
 
     let light = PointLight::new(Tuple::point(10.0, 10.0, 2.0), Color::new(1.0, 1.0, 1.0));
-    let mut world = World::new(light);
+    let mut world = World::new();
+    world.lights = vec![light];
     world.objects = vec![csg];
 
     let camera = Camera::new(

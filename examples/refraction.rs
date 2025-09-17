@@ -32,7 +32,8 @@ fn main() {
     air.material.refractive_index = 1.0;
 
     let light = PointLight::new(Tuple::point(0.0, 100.0, 100.0), Color::new(1.0, 1.0, 1.0));
-    let mut world = World::new(light);
+    let mut world = World::new();
+    world.lights = vec![light];
     world.objects = vec![floor, glass, air];
 
     let camera = Camera::new(

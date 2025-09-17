@@ -36,7 +36,8 @@ fn main() {
     left.material.specular = 0.3;
 
     let light = PointLight::new(Tuple::point(-10.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
-    let mut world = World::new(light);
+    let mut world = World::new();
+    world.lights = vec![light];
     world.objects = vec![floor, left_wall, middle, right, left];
 
     let camera = Camera::new(

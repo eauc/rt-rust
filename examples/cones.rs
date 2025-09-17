@@ -34,7 +34,8 @@ fn main() {
     right.material.color = Color::new(0.2, 1.0, 0.5);
 
     let light = PointLight::new(Tuple::point(10.0, 5.0, 2.0), Color::new(1.0, 1.0, 1.0));
-    let mut world = World::new(light);
+    let mut world = World::new();
+    world.lights = vec![light];
     world.objects = vec![floor, middle, left, right];
 
     let camera = Camera::new(

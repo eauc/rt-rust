@@ -12,7 +12,8 @@ fn main() {
     let hexagon = hexagon();
 
     let light = PointLight::new(Tuple::point(0.0, 50.0, 25.0), Color::new(1.0, 0.2, 1.0));
-    let mut world = World::new(light);
+    let mut world = World::new();
+    world.lights = vec![light];
     world.objects = vec![hexagon];
 
     let camera = Camera::new(

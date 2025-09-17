@@ -1,8 +1,8 @@
 use crate::colors::{BLACK, Color, WHITE};
 use crate::floats::Float;
 use crate::lights::PointLight;
-use crate::patterns::Pattern;
 use crate::objects::Object;
+use crate::patterns::Pattern;
 use crate::tuples::Tuple;
 use std::fmt;
 
@@ -50,35 +50,45 @@ impl Material {
     pub fn lighting(
         &self,
         object: &Object,
-        light: &PointLight,
+        ambient_light: Color,
+        lights: &Vec<PointLight>,
         position: Tuple,
         eyev: Tuple,
         normalv: Tuple,
-        in_shadow: bool,
     ) -> Color {
         let color = if let Some(pattern) = &self.pattern {
             pattern.color_at_object(object, position)
         } else {
             self.color
         };
-        let effective_color = color * light.intensity;
+        let effective_color = color * ambient_light;
         let ambient = effective_color * self.ambient;
-        let lightv = (light.position - position).normalize();
-        let light_dot_normal = lightv.dot(normalv);
-        let (diffuse, specular) = if in_shadow || light_dot_normal < 0.0 {
-            (BLACK, BLACK)
-        } else {
-            let diffuse = effective_color * self.diffuse * light_dot_normal;
-            let reflectv = (-lightv).reflect(normalv);
-            let reflect_dot_eye = reflectv.dot(eyev);
-            if reflect_dot_eye <= 0.0 {
-                (diffuse, BLACK)
-            } else {
-                let factor = reflect_dot_eye.powf(self.shininess);
-                let specular = light.intensity * self.specular * factor;
-                (diffuse, specular)
+        let mut diffuse = BLACK;
+        let mut specular = BLACK;
+        for light in lights {
+            if light.intensity == BLACK {
+                continue;
             }
-        };
+            let lightv = (light.position - position).normalize();
+            let light_dot_normal = lightv.dot(normalv);
+            let (diffusel, specularl) = if light_dot_normal < 0.0 {
+                (BLACK, BLACK)
+            } else {
+                let effective_color = color * light.intensity;
+                let diffuse = effective_color * self.diffuse * light_dot_normal;
+                let reflectv = (-lightv).reflect(normalv);
+                let reflect_dot_eye = reflectv.dot(eyev);
+                if reflect_dot_eye <= 0.0 {
+                    (diffuse, BLACK)
+                } else {
+                    let factor = reflect_dot_eye.powf(self.shininess);
+                    let specular = light.intensity * self.specular * factor;
+                    (diffuse, specular)
+                }
+            };
+            diffuse = diffuse + diffusel;
+            specular = specular + specularl;
+        }
         ambient + diffuse + specular
     }
 }
@@ -114,7 +124,7 @@ mod tests {
     #[test]
     fn the_default_material() {
         let m = Material::default();
-        assert_eq!(m.color, Color::new(1.0, 1.0, 1.0));
+        assert_eq!(m.color, WHITE);
         assert_eq!(m.ambient, 0.1);
         assert_eq!(m.diffuse, 0.9);
         assert!(m.pattern.is_none());
@@ -132,8 +142,8 @@ mod tests {
         let eyev = Tuple::vector(0.0, 0.0, -1.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
-        let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), Color::new(1.0, 1.0, 1.0));
-        let result = m.lighting(&s, &light, position, eyev, normalv, false);
+        let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), WHITE);
+        let result = m.lighting(&s, WHITE, &vec![light], position, eyev, normalv);
         assert_eq!(result, Color::new(1.9, 1.9, 1.9));
     }
 
@@ -144,9 +154,9 @@ mod tests {
         let eyev = Tuple::vector(0.0, (2.0_f32).sqrt() / 2.0, (2.0_f32).sqrt() / 2.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
-        let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), Color::new(1.0, 1.0, 1.0));
-        let result = m.lighting(&s, &light, position, eyev, normalv, false);
-        assert_eq!(result, Color::new(1.0, 1.0, 1.0));
+        let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), WHITE);
+        let result = m.lighting(&s, WHITE, &vec![light], position, eyev, normalv);
+        assert_eq!(result, WHITE);
     }
 
     #[test]
@@ -156,8 +166,8 @@ mod tests {
         let eyev = Tuple::vector(0.0, 0.0, -1.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
-        let light = PointLight::new(Tuple::point(0.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
-        let result = m.lighting(&s, &light, position, eyev, normalv, false);
+        let light = PointLight::new(Tuple::point(0.0, 10.0, -10.0), WHITE);
+        let result = m.lighting(&s, WHITE, &vec![light], position, eyev, normalv);
         assert_eq!(result, Color::new(0.7364, 0.7364, 0.7364));
     }
 
@@ -168,8 +178,8 @@ mod tests {
         let eyev = Tuple::vector(0.0, -(2.0_f32).sqrt() / 2.0, -(2.0_f32).sqrt() / 2.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
-        let light = PointLight::new(Tuple::point(0.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
-        let result = m.lighting(&s, &light, position, eyev, normalv, false);
+        let light = PointLight::new(Tuple::point(0.0, 10.0, -10.0), WHITE);
+        let result = m.lighting(&s, WHITE, &vec![light], position, eyev, normalv);
         assert_eq!(result, Color::new(1.6363853, 1.6363853, 1.6363853));
     }
 
@@ -180,8 +190,8 @@ mod tests {
         let eyev = Tuple::vector(0.0, 0.0, -1.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
-        let light = PointLight::new(Tuple::point(0.0, 0.0, 10.0), Color::new(1.0, 1.0, 1.0));
-        let result = m.lighting(&s, &light, position, eyev, normalv, false);
+        let light = PointLight::new(Tuple::point(0.0, 0.0, 10.0), WHITE);
+        let result = m.lighting(&s, WHITE, &vec![light], position, eyev, normalv);
         assert_eq!(result, Color::new(0.1, 0.1, 0.1));
     }
 
@@ -192,9 +202,8 @@ mod tests {
         let eyev = Tuple::vector(0.0, 0.0, -1.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
-        let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), Color::new(1.0, 1.0, 1.0));
-        let in_shadow = true;
-        let result = m.lighting(&s, &light, position, eyev, normalv, in_shadow);
+        let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), BLACK);
+        let result = m.lighting(&s, WHITE, &vec![light], position, eyev, normalv);
         assert_eq!(result, Color::new(0.1, 0.1, 0.1));
     }
 
@@ -209,15 +218,23 @@ mod tests {
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
         let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), WHITE);
+        let light_shadow = PointLight::new(Tuple::point(0.0, 0.0, -10.0), BLACK);
         let c1 = m.lighting(
             &s,
-            &light,
+            WHITE,
+            &vec![light],
             Tuple::point(0.9, 0.0, 0.0),
             eyev,
             normalv,
-            false,
         );
-        let c2 = m.lighting(&s, &light, Tuple::point(1.1, 0.0, 0.0), eyev, normalv, true);
+        let c2 = m.lighting(
+            &s,
+            WHITE,
+            &vec![light_shadow],
+            Tuple::point(1.1, 0.0, 0.0),
+            eyev,
+            normalv,
+        );
         assert_eq!(c1, WHITE);
         assert_eq!(c2, BLACK);
     }
