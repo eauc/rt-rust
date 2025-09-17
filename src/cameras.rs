@@ -1,24 +1,33 @@
 use crate::canvas::Canvas;
-use crate::floats::Float;
+use crate::floats::{Float, rand};
 use crate::matrices::Matrix;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 use crate::worlds::World;
 
 pub struct Camera {
+    focal_length: Float,
+    pub aperture: Float,
     hsize: usize,
     vsize: usize,
     half_width: Float,
     half_height: Float,
     pixel_size: Float,
+    pub blur_oversampling: usize,
     pub oversampling: usize,
     render_depth: usize,
     transform_inv: Matrix<4>,
 }
 
 impl Camera {
-    pub fn new(hsize: usize, vsize: usize, field_of_view: Float, transform: Matrix<4>) -> Camera {
-        let half_view = (field_of_view / 2.0).tan();
+    pub fn new(
+        hsize: usize,
+        vsize: usize,
+        focal_length: Float,
+        field_of_view: Float,
+        transform: Matrix<4>,
+    ) -> Camera {
+        let half_view = focal_length * (field_of_view / 2.0).tan();
         let aspect = hsize as Float / vsize as Float;
         let (half_width, half_height) = if aspect >= 1.0 {
             (half_view, half_view / aspect)
@@ -26,24 +35,38 @@ impl Camera {
             (half_view * aspect, half_view)
         };
         Camera {
+            focal_length,
+            aperture: 0.0,
             hsize,
             vsize,
             half_width,
             half_height,
             pixel_size: half_width * 2.0 / hsize as Float,
+            blur_oversampling: 1,
             oversampling: 2,
             render_depth: 5,
             transform_inv: transform.inverse(),
         }
     }
 
-    fn ray_for_coordinates(&self, x_offset: Float, y_offset: Float) -> Ray {
+    fn rays_for_coordinates(&self, x_offset: Float, y_offset: Float) -> Vec<Ray> {
         let lens_x = self.half_width - x_offset;
         let lens_y = self.half_height - y_offset;
-        let pixel = self.transform_inv * Tuple::point(lens_x, lens_y, -1.0);
-        let origin = self.transform_inv * Tuple::point(0.0, 0.0, 0.0);
-        let direction = (pixel - origin).normalize();
-        return Ray::new(origin, direction);
+        let pixel = self.transform_inv * Tuple::point(lens_x, lens_y, -self.focal_length);
+        let mut rays = vec![];
+        let aperture = self.focal_length * self.aperture;
+        for _ in 0..self.blur_oversampling {
+            let lens_origin = Tuple::point(0.0, 0.0, 0.0)
+                + if self.blur_oversampling > 1 {
+                    Tuple::vector(rand(aperture), rand(aperture), 0.0)
+                } else {
+                    Tuple::vector(0.0, 0.0, 0.0)
+                };
+            let origin = self.transform_inv * lens_origin;
+            let direction = (pixel - origin).normalize();
+            rays.push(Ray::new(origin, direction));
+        }
+        rays
     }
     fn rays_for_pixel(&self, x: usize, y: usize) -> Vec<Ray> {
         let mut rays = Vec::new();
@@ -53,7 +76,7 @@ impl Camera {
             for dy in 0..self.oversampling {
                 let x_offset = (x as Float + start_offset + dx as Float * offset) * self.pixel_size;
                 let y_offset = (y as Float + start_offset + dy as Float * offset) * self.pixel_size;
-                rays.push(self.ray_for_coordinates(x_offset, y_offset));
+                rays.extend(self.rays_for_coordinates(x_offset, y_offset));
             }
         }
         rays
@@ -91,26 +114,27 @@ mod tests {
         let hsize = 160;
         let vsize = 120;
         let field_of_view = PI / 2.0;
-        let c = Camera::new(hsize, vsize, field_of_view, Matrix::identity());
+        let c = Camera::new(hsize, vsize, 1.0, field_of_view, Matrix::identity());
         assert_eq!(c.hsize, 160);
         assert_eq!(c.vsize, 120);
     }
 
     #[test]
     fn the_pixel_size_for_a_horizontal_canvas() {
-        let c = Camera::new(200, 125, PI / 2.0, Matrix::identity());
+        let c = Camera::new(200, 125, 1.0, PI / 2.0, Matrix::identity());
         assert_eq!(c.pixel_size, 0.01);
     }
 
     #[test]
     fn the_pixel_size_for_a_vertical_canvas() {
-        let c = Camera::new(125, 200, PI / 2.0, Matrix::identity());
+        let c = Camera::new(125, 200, 1.0, PI / 2.0, Matrix::identity());
         assert_eq!(c.pixel_size, 0.01);
     }
 
     #[test]
     fn constructing_a_ray_through_the_center_of_the_canvas() {
-        let c = Camera::new(201, 101, PI / 2.0, Matrix::identity());
+        let mut c = Camera::new(201, 101, 1.0, PI / 2.0, Matrix::identity());
+        c.oversampling = 1;
         let rs = c.rays_for_pixel(100, 50);
         let r = &rs[0];
         assert_eq!(r.origin, Tuple::point(0.0, 0.0, 0.0));
@@ -119,7 +143,8 @@ mod tests {
 
     #[test]
     fn constructing_a_ray_through_a_corner_of_the_canvas() {
-        let c = Camera::new(201, 101, PI / 2.0, Matrix::identity());
+        let mut c = Camera::new(201, 101, 1.0, PI / 2.0, Matrix::identity());
+        c.oversampling = 1;
         let rs = c.rays_for_pixel(0, 0);
         let r = &rs[0];
         assert_eq!(r.origin, Tuple::point(0.0, 0.0, 0.0));
@@ -128,12 +153,14 @@ mod tests {
 
     #[test]
     fn constructing_a_ray_when_the_camera_is_transformed() {
-        let c = Camera::new(
+        let mut c = Camera::new(
             201,
             101,
+            1.0,
             PI / 2.0,
             rotation_y(PI / 4.0) * translation(0.0, -2.0, 5.0),
         );
+        c.oversampling = 1;
         let rs = c.rays_for_pixel(100, 50);
         let r = &rs[0];
         assert_eq!(r.origin, Tuple::point(0.0, 2.0, -5.0));
@@ -149,7 +176,8 @@ mod tests {
         let from = Tuple::point(0.0, 0.0, -5.0);
         let to = Tuple::point(0.0, 0.0, 0.0);
         let up = Tuple::vector(0.0, 1.0, 0.0);
-        let mut c = Camera::new(11, 11, PI / 2.0, view_transform(from, to, up));
+        let mut c = Camera::new(11, 11, 1.0, PI / 2.0, view_transform(from, to, up));
+        c.oversampling = 1;
         c.render_depth = 1;
         let image = c.render(&mut w);
         assert_eq!(image.pixel_at(5, 5), Color::new(0.38066, 0.47583, 0.2855));

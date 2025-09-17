@@ -19,6 +19,7 @@ fn main() {
     let camera = Camera::new(
         500,
         300,
+        1.0,
         PI / 3.0,
         view_transform(
             Tuple::point(3.0, 3.0, 3.0),
