@@ -1,7 +1,7 @@
 use rt_rust::cameras::Camera;
 use rt_rust::colors::Color;
 use rt_rust::floats::Float;
-use rt_rust::lights::PointLight;
+use rt_rust::lights::Light;
 use rt_rust::objects::Object;
 use rt_rust::transformations::{rotation_y, rotation_z, scaling, translation, view_transform};
 use rt_rust::tuples::Tuple;
@@ -11,7 +11,7 @@ use std::f32::consts::PI;
 fn main() {
     let hexagon = hexagon();
 
-    let light = PointLight::new(Tuple::point(0.0, 50.0, 25.0), Color::new(1.0, 0.2, 1.0));
+    let light = Light::new_point(Tuple::point(0.0, 50.0, 25.0), Color::new(1.0, 0.2, 1.0));
     let mut world = World::new();
     world.lights = vec![light];
     world.objects = vec![hexagon];

@@ -1,6 +1,6 @@
 use rt_rust::cameras::Camera;
 use rt_rust::colors::Color;
-use rt_rust::lights::PointLight;
+use rt_rust::lights::Light;
 use rt_rust::objects::Object;
 use rt_rust::transformations::{rotation_y, rotation_z, scaling, translation, view_transform};
 use rt_rust::tuples::Tuple;
@@ -33,7 +33,7 @@ fn main() {
     right.as_mut_cylinder().truncate(-1.0, 1.0, false);
     right.material.color = Color::new(0.2, 1.0, 0.5);
 
-    let light = PointLight::new(Tuple::point(10.0, 10.0, 2.0), Color::new(1.0, 1.0, 1.0));
+    let light = Light::new_point(Tuple::point(10.0, 10.0, 2.0), Color::new(1.0, 1.0, 1.0));
     let mut world = World::new();
     world.lights = vec![light];
     world.objects = vec![floor, middle, left, right];

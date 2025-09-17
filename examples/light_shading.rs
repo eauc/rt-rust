@@ -1,7 +1,7 @@
 use rt_rust::canvas::Canvas;
 use rt_rust::colors::{Color, WHITE};
 use rt_rust::intersections;
-use rt_rust::lights::PointLight;
+use rt_rust::lights::Light;
 use rt_rust::objects::Object;
 use rt_rust::rays::Ray;
 use rt_rust::tuples::Tuple;
@@ -16,7 +16,7 @@ fn main() {
     let mut canvas = Canvas::new(canvas_pixel, canvas_pixel);
     let mut sphere = Object::new_sphere();
     sphere.material.color = Color::new(1.0, 0.2, 1.0);
-    let light = PointLight::new(Tuple::point(-10.0, 10.0, -10.0), WHITE);
+    let light = Light::new_point(Tuple::point(-10.0, 10.0, -10.0), WHITE);
     for y in 0..canvas_pixel {
         let world_y = half - pixel_size * y as f32;
         for x in 0..canvas_pixel {

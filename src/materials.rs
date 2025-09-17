@@ -1,6 +1,6 @@
 use crate::colors::{BLACK, Color, WHITE};
 use crate::floats::Float;
-use crate::lights::PointLight;
+use crate::lights::Light;
 use crate::objects::Object;
 use crate::patterns::Pattern;
 use crate::tuples::Tuple;
@@ -51,7 +51,7 @@ impl Material {
         &self,
         object: &Object,
         ambient_light: Color,
-        lights: &Vec<PointLight>,
+        lights: &Vec<Light>,
         position: Tuple,
         eyev: Tuple,
         normalv: Tuple,
@@ -142,7 +142,7 @@ mod tests {
         let eyev = Tuple::vector(0.0, 0.0, -1.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
-        let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), WHITE);
+        let light = Light::new_point(Tuple::point(0.0, 0.0, -10.0), WHITE);
         let result = m.lighting(&s, WHITE, &vec![light], position, eyev, normalv);
         assert_eq!(result, Color::new(1.9, 1.9, 1.9));
     }
@@ -154,7 +154,7 @@ mod tests {
         let eyev = Tuple::vector(0.0, (2.0_f32).sqrt() / 2.0, (2.0_f32).sqrt() / 2.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
-        let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), WHITE);
+        let light = Light::new_point(Tuple::point(0.0, 0.0, -10.0), WHITE);
         let result = m.lighting(&s, WHITE, &vec![light], position, eyev, normalv);
         assert_eq!(result, WHITE);
     }
@@ -166,7 +166,7 @@ mod tests {
         let eyev = Tuple::vector(0.0, 0.0, -1.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
-        let light = PointLight::new(Tuple::point(0.0, 10.0, -10.0), WHITE);
+        let light = Light::new_point(Tuple::point(0.0, 10.0, -10.0), WHITE);
         let result = m.lighting(&s, WHITE, &vec![light], position, eyev, normalv);
         assert_eq!(result, Color::new(0.7364, 0.7364, 0.7364));
     }
@@ -178,7 +178,7 @@ mod tests {
         let eyev = Tuple::vector(0.0, -(2.0_f32).sqrt() / 2.0, -(2.0_f32).sqrt() / 2.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
-        let light = PointLight::new(Tuple::point(0.0, 10.0, -10.0), WHITE);
+        let light = Light::new_point(Tuple::point(0.0, 10.0, -10.0), WHITE);
         let result = m.lighting(&s, WHITE, &vec![light], position, eyev, normalv);
         assert_eq!(result, Color::new(1.6363853, 1.6363853, 1.6363853));
     }
@@ -190,7 +190,7 @@ mod tests {
         let eyev = Tuple::vector(0.0, 0.0, -1.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
-        let light = PointLight::new(Tuple::point(0.0, 0.0, 10.0), WHITE);
+        let light = Light::new_point(Tuple::point(0.0, 0.0, 10.0), WHITE);
         let result = m.lighting(&s, WHITE, &vec![light], position, eyev, normalv);
         assert_eq!(result, Color::new(0.1, 0.1, 0.1));
     }
@@ -202,7 +202,7 @@ mod tests {
         let eyev = Tuple::vector(0.0, 0.0, -1.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
-        let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), BLACK);
+        let light = Light::new_point(Tuple::point(0.0, 0.0, -10.0), BLACK);
         let result = m.lighting(&s, WHITE, &vec![light], position, eyev, normalv);
         assert_eq!(result, Color::new(0.1, 0.1, 0.1));
     }
@@ -217,8 +217,8 @@ mod tests {
         let eyev = Tuple::vector(0.0, 0.0, -1.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
-        let light = PointLight::new(Tuple::point(0.0, 0.0, -10.0), WHITE);
-        let light_shadow = PointLight::new(Tuple::point(0.0, 0.0, -10.0), BLACK);
+        let light = Light::new_point(Tuple::point(0.0, 0.0, -10.0), WHITE);
+        let light_shadow = Light::new_point(Tuple::point(0.0, 0.0, -10.0), BLACK);
         let c1 = m.lighting(
             &s,
             WHITE,

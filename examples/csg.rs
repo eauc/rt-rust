@@ -1,6 +1,6 @@
 use rt_rust::cameras::Camera;
 use rt_rust::colors::Color;
-use rt_rust::lights::PointLight;
+use rt_rust::lights::Light;
 use rt_rust::objects::Object;
 use rt_rust::shapes::csg::Operation;
 use rt_rust::transformations::{rotation_x, rotation_z, scaling, view_transform};
@@ -24,7 +24,7 @@ fn main() {
     let c3 = Object::new_csg(Operation::Intersection, sphere, cube);
     let csg = Object::new_csg(Operation::Difference, c3, c2);
 
-    let light = PointLight::new(Tuple::point(10.0, 10.0, 2.0), Color::new(1.0, 1.0, 1.0));
+    let light = Light::new_point(Tuple::point(10.0, 10.0, 2.0), Color::new(1.0, 1.0, 1.0));
     let mut world = World::new();
     world.lights = vec![light];
     world.objects = vec![csg];

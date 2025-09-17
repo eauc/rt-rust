@@ -1,6 +1,6 @@
 use rt_rust::cameras::Camera;
 use rt_rust::colors::Color;
-use rt_rust::lights::PointLight;
+use rt_rust::lights::Light;
 use rt_rust::obj_files::parse_obj_file_path;
 use rt_rust::transformations::view_transform;
 use rt_rust::tuples::Tuple;
@@ -11,7 +11,7 @@ fn main() {
     let teapot_low_obj = parse_obj_file_path("examples/teapot_low.obj");
     let teapot_obj = parse_obj_file_path("examples/teapot.obj");
 
-    let light = PointLight::new(Tuple::point(100.0, 100.0, 100.0), Color::new(1.0, 1.0, 1.0));
+    let light = Light::new_point(Tuple::point(100.0, 100.0, 100.0), Color::new(1.0, 1.0, 1.0));
     let mut world_low = World::new();
     world_low.lights = vec![light];
     world_low.objects = vec![teapot_low_obj.default_group];

@@ -1,6 +1,6 @@
 use rt_rust::cameras::Camera;
 use rt_rust::colors::{BLACK, Color, WHITE};
-use rt_rust::lights::PointLight;
+use rt_rust::lights::Light;
 use rt_rust::matrices::Matrix;
 use rt_rust::objects::Object;
 use rt_rust::patterns::Pattern;
@@ -31,7 +31,7 @@ fn main() {
     air.material.transparency = 1.0;
     air.material.refractive_index = 1.0;
 
-    let light = PointLight::new(Tuple::point(0.0, 100.0, 100.0), Color::new(1.0, 1.0, 1.0));
+    let light = Light::new_point(Tuple::point(0.0, 100.0, 100.0), Color::new(1.0, 1.0, 1.0));
     let mut world = World::new();
     world.lights = vec![light];
     world.objects = vec![floor, glass, air];
