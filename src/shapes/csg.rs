@@ -67,7 +67,7 @@ impl Csg {
         let left = &self.children[0];
         let mut inl = false;
         let mut inr = false;
-        let mut result = vec![];
+        let mut result = Vec::with_capacity(xs.len());
         for x in xs {
             let lhit = left.includes(x.object);
             if intersection_allowed(self.operation, lhit, inl, inr) {

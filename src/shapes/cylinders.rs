@@ -30,7 +30,7 @@ impl Cylinder {
         bounds.max = Tuple::point(1.0, self.maximum, 1.0);
     }
     pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {
-        let mut xs = vec![];
+        let mut xs = Vec::with_capacity(4);
         self.intersect_sides(ray, &mut xs);
         self.intersect_caps(ray, &mut xs);
         xs.iter().map(|t| Intersection::new(*t, object)).collect()

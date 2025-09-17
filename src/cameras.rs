@@ -55,11 +55,10 @@ impl Camera {
         }
     }
 
-    fn rays_for_coordinates(&self, x_offset: Float, y_offset: Float) -> Vec<Ray> {
+    fn rays_for_coordinates(&self, x_offset: Float, y_offset: Float, rays: &mut Vec<Ray>) {
         let lens_x = self.half_width - x_offset;
         let lens_y = self.half_height - y_offset;
         let pixel = self.transform_inv * Tuple::point(lens_x, lens_y, -self.focal_length);
-        let mut rays = vec![];
         let aperture = self.focal_length * self.aperture;
         for _ in 0..self.blur_oversampling {
             let lens_origin = Tuple::point(0.0, 0.0, 0.0)
@@ -72,17 +71,16 @@ impl Camera {
             let direction = (pixel - origin).normalize();
             rays.push(Ray::new(origin, direction));
         }
-        rays
     }
     fn rays_for_pixel(&self, x: usize, y: usize) -> Vec<Ray> {
-        let mut rays = Vec::new();
+        let mut rays = Vec::with_capacity(self.oversampling.pow(2) * self.blur_oversampling);
         let offset = 1.0 / self.oversampling as Float;
         let start_offset = offset / 2.0;
         for dx in 0..self.oversampling {
             for dy in 0..self.oversampling {
                 let x_offset = (x as Float + start_offset + dx as Float * offset) * self.pixel_size;
                 let y_offset = (y as Float + start_offset + dy as Float * offset) * self.pixel_size;
-                rays.extend(self.rays_for_coordinates(x_offset, y_offset));
+                self.rays_for_coordinates(x_offset, y_offset, &mut rays);
             }
         }
         rays
@@ -93,7 +91,7 @@ impl Camera {
         world.prepare();
         let world = Arc::new(world);
         let image = Arc::new(Mutex::new(Canvas::new(self.hsize, self.vsize)));
-        let mut handles = Vec::new();
+        let mut handles = Vec::with_capacity(self.threads);
         let chunk_size = self.vsize / self.threads;
         let pb = Arc::new(Mutex::new(ProgressBar::new(self.vsize as u64)));
         for i in 0..self.threads {

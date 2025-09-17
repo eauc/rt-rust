@@ -38,9 +38,9 @@ impl Canvas {
     }
 
     fn ppm_pixels(&self) -> String {
-        let mut lines: Vec<String> = vec![];
+        let mut lines: Vec<String> = Vec::with_capacity(self.height);
         for y in 0..self.height {
-            let mut line: Vec<String> = vec![];
+            let mut line: Vec<String> = Vec::with_capacity(3 * self.width);
             for x in 0..self.width {
                 let pixel = self.pixel_at(x, y);
                 line.push(ppm_clamp_color(pixel.red()).to_string());

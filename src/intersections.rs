@@ -65,7 +65,7 @@ impl<'a> Intersection<'a> {
     }
 
     fn find_refraction_indices(&self, xs: &Vec<Intersection>) -> (Float, Float) {
-        let mut containers: Vec<&Object> = vec![];
+        let mut containers: Vec<&Object> = Vec::with_capacity(xs.len());
         let mut n1 = 1.0;
         let mut n2 = 1.0;
         for x in xs {
