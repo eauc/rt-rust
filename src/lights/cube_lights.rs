@@ -13,8 +13,8 @@ pub struct CubeLight {
 impl CubeLight {
     pub fn new(size: Float, samples: usize) -> CubeLight {
         CubeLight {
-            size: size,
-            samples: samples,
+            size,
+            samples,
         }
     }
 

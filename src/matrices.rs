@@ -12,17 +12,17 @@ impl<const M: usize> Matrix<M> {
 
     pub fn identity() -> Matrix<M> {
         let mut data = [[0.0; M]; M];
-        for i in 0..M {
-            data[i][i] = 1.0;
+        for (i, line) in data.iter_mut().enumerate().take(M) {
+            line[i] = 1.0;
         }
         Matrix(data)
     }
 
     pub fn transpose(self) -> Matrix<M> {
         let mut data = [[0.0; M]; M];
-        for i in 0..M {
-            for j in 0..M {
-                data[j][i] = self.0[i][j];
+        for (i, line) in data.iter_mut().enumerate().take(M) {
+            for (j, cell) in line.iter_mut().enumerate().take(M) {
+                *cell = self.0[j][i];
             }
         }
         Matrix(data)
@@ -49,7 +49,7 @@ impl Matrix<3> {
                 }
             }
         }
-        return Matrix(data);
+        Matrix(data)
     }
 
     fn minor(self, row: usize, column: usize) -> Float {
@@ -86,7 +86,7 @@ impl Matrix<4> {
                 }
             }
         }
-        return Matrix(data);
+        Matrix(data)
     }
 
     fn minor(self, row: usize, column: usize) -> Float {

@@ -30,11 +30,11 @@ impl Canvas {
     }
 
     pub fn to_ppm(&self) -> String {
-        vec![self.ppm_header(), self.ppm_pixels(), String::from("")].join("\n")
+        [self.ppm_header(), self.ppm_pixels(), String::from("")].join("\n")
     }
 
     fn ppm_header(&self) -> String {
-        vec!["P3", &format!("{} {}", self.width, self.height), "255"].join("\n")
+        ["P3", &format!("{} {}", self.width, self.height), "255"].join("\n")
     }
 
     fn ppm_pixels(&self) -> String {
@@ -65,7 +65,7 @@ impl Canvas {
 }
 
 fn ppm_clamp_color(v: Float) -> u8 {
-    (v * 255.0).min(255.0).max(0.0).round() as u8
+    (v * 255.0).clamp(0.0, 255.0).round() as u8
 }
 
 #[cfg(test)]

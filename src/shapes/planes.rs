@@ -32,6 +32,12 @@ impl Plane {
     }
 }
 
+impl Default for Plane {
+    fn default() -> Plane {
+        Plane::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
 

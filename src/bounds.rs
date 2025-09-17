@@ -9,14 +9,16 @@ pub struct Bounds {
     pub max: Tuple,
 }
 
-impl Bounds {
-    pub fn default() -> Bounds {
+impl Default for Bounds {
+    fn default() -> Self {
         Bounds {
             min: Tuple::point(-1.0, -1.0, -1.0),
             max: Tuple::point(1.0, 1.0, 1.0),
         }
     }
+}
 
+impl Bounds {
     pub fn intersect(&self, ray: &Ray) -> bool {
         let (xtmin, xtmax) = check_axis(
             ray.origin.x(),

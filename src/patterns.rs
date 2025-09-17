@@ -8,7 +8,7 @@ mod gradients;
 mod rings;
 mod stripes;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Pattern {
     pattern: Patterns,
     transform_inverse: Matrix<4>,
@@ -52,7 +52,7 @@ impl Pattern {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 enum Patterns {
     Checker(checkers::CheckerPattern),
     Gradient(gradients::GradientPattern),
@@ -73,7 +73,7 @@ impl Patterns {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 struct TestPattern;
 
 impl TestPattern {

@@ -45,7 +45,7 @@ impl Cylinder {
         }
         Tuple::vector(local_point.x(), 0.0, local_point.z())
     }
-    fn intersect_caps<'a>(&'a self, ray: &Ray, xs: &mut Vec<Float>) {
+    fn intersect_caps(&self, ray: &Ray, xs: &mut Vec<Float>) {
         if !self.closed || equals(ray.direction.y(), 0.0) {
             return;
         }
@@ -58,7 +58,7 @@ impl Cylinder {
             xs.push(t);
         }
     }
-    fn intersect_sides<'a>(&'a self, ray: &Ray, xs: &mut Vec<Float>) {
+    fn intersect_sides(&self, ray: &Ray, xs: &mut Vec<Float>) {
         let a = ray.direction.x().powi(2) + ray.direction.z().powi(2);
         if equals(a, 0.0) {
             return;
@@ -83,10 +83,16 @@ impl Cylinder {
     }
 }
 
+impl Default for Cylinder {
+    fn default() -> Cylinder {
+        Cylinder::new()
+    }
+}
+
 fn check_cap(ray: &Ray, t: Float) -> bool {
     let x = ray.origin.x() + t * ray.direction.x();
     let z = ray.origin.z() + t * ray.direction.z();
-    return x.powi(2) + z.powi(2) <= 1.0 + EPSILON;
+    x.powi(2) + z.powi(2) <= 1.0 + EPSILON
 }
 
 #[cfg(test)]

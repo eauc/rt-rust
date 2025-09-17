@@ -1,7 +1,7 @@
 use crate::colors::Color;
 use crate::tuples::Tuple;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct RingPattern {
     a: Color,
     b: Color,

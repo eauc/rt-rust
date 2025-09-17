@@ -69,7 +69,7 @@ impl<'a> Intersection<'a> {
         let mut n1 = 1.0;
         let mut n2 = 1.0;
         for x in xs {
-            if x.t == self.t && containers.len() > 0 {
+            if x.t == self.t && !containers.is_empty() {
                 n1 = containers.last().unwrap().material.refractive_index;
             }
             let i = containers.iter().position(|c| ptr::eq(*c, x.object));
@@ -79,7 +79,7 @@ impl<'a> Intersection<'a> {
                 containers.push(x.object);
             }
             if x.t == self.t {
-                if containers.len() > 0 {
+                if !containers.is_empty() {
                     n2 = containers.last().unwrap().material.refractive_index;
                 }
                 break;

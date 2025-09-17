@@ -53,7 +53,7 @@ impl Cone {
         Tuple::vector(local_point.x(), y, local_point.z())
     }
 
-    fn intersect_caps<'a>(&'a self, ray: &Ray, xs: &mut Vec<Float>) {
+    fn intersect_caps(&self, ray: &Ray, xs: &mut Vec<Float>) {
         if !self.closed || equals(ray.direction.y(), 0.0) {
             return;
         }
@@ -67,7 +67,7 @@ impl Cone {
         }
     }
 
-    fn intersect_sides<'a>(&'a self, ray: &Ray, xs: &mut Vec<Float>) {
+    fn intersect_sides(&self, ray: &Ray, xs: &mut Vec<Float>) {
         let a = ray.direction.x().powi(2) - ray.direction.y().powi(2) + ray.direction.z().powi(2);
         let b = 2.0 * ray.origin.x() * ray.direction.x() - 2.0 * ray.origin.y() * ray.direction.y()
             + 2.0 * ray.origin.z() * ray.direction.z();
@@ -96,10 +96,16 @@ impl Cone {
     }
 }
 
+impl Default for Cone {
+    fn default() -> Cone {
+        Cone::new()
+    }
+}
+
 fn check_cap(ray: &Ray, t: Float, radius: Float) -> bool {
     let x = ray.origin.x() + t * ray.direction.x();
     let z = ray.origin.z() + t * ray.direction.z();
-    return x.powi(2) + z.powi(2) <= radius + EPSILON;
+    x.powi(2) + z.powi(2) <= radius + EPSILON
 }
 
 #[cfg(test)]

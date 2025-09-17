@@ -3,7 +3,9 @@ use crate::tuples::Tuple;
 
 pub struct ObjFile {
     pub default_group: Object,
+    #[allow(dead_code)]
     normals: Vec<Tuple>,
+    #[allow(dead_code)]
     vertices: Vec<Tuple>,
 }
 
@@ -34,7 +36,7 @@ fn parse_obj_file(lines: &str) -> ObjFile {
             Some("f") => {
                 let mut indices: Vec<usize> = vec![];
                 let mut normal_indices: Vec<usize> = vec![];
-                while let Some(word) = words.next() {
+                for word in words {
                     if word.contains('/') {
                         let mut ints = word.split('/');
                         indices.push(ints.next().unwrap().parse().unwrap());
@@ -62,8 +64,8 @@ fn parse_obj_file(lines: &str) -> ObjFile {
 }
 
 fn fan_triangulation(
-    vertices: &Vec<Tuple>,
-    normals: &Vec<Tuple>,
+    vertices: &[Tuple],
+    normals: &[Tuple],
     indices: Vec<usize>,
     normal_indices: Vec<usize>,
     group: &mut Object,
@@ -72,7 +74,7 @@ fn fan_triangulation(
         let p1 = vertices[indices[0] - 1];
         let p2 = vertices[indices[i] - 1];
         let p3 = vertices[indices[i + 1] - 1];
-        if normal_indices.len() > 0 {
+        if !normal_indices.is_empty() {
             let n1 = normals[normal_indices[0] - 1];
             let n2 = normals[normal_indices[i] - 1];
             let n3 = normals[normal_indices[i + 1] - 1];

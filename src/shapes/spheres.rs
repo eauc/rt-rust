@@ -30,6 +30,12 @@ impl Sphere {
     }
 }
 
+impl Default for Sphere {
+    fn default() -> Sphere {
+        Sphere::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

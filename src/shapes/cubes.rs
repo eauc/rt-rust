@@ -42,6 +42,12 @@ impl Cube {
     }
 }
 
+impl Default for Cube {
+    fn default() -> Cube {
+        Cube::new()
+    }
+}
+
 fn check_axis(origin: Float, direction: Float) -> (Float, Float) {
     let tmin_numerator = -1.0 - origin;
     let tmax_numerator = 1.0 - origin;

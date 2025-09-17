@@ -1,7 +1,7 @@
 use crate::colors::Color;
 use crate::tuples::Tuple;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct CheckerPattern {
     a: Color,
     b: Color,

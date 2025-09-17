@@ -79,11 +79,7 @@ impl World {
             .map(|l| {
                 l.shadowed(comps.over_point, |r| {
                     let xs = self.intersect(r);
-                    if let Some(hit) = intersections::hit(&xs) {
-                        Some(hit.t)
-                    } else {
-                        None
-                    }
+                    intersections::hit(&xs).map(|h| h.t)
                 })
             })
             .collect();
@@ -109,11 +105,17 @@ impl World {
     pub fn color_at(&self, ray: &Ray, depth: usize) -> Color {
         let xs = self.intersect(ray);
         if let Some(hit) = intersections::hit(&xs) {
-            let comps = hit.prepare_computations(&ray, &xs);
-            self.shade_hit(&hit, &comps, depth)
+            let comps = hit.prepare_computations(ray, &xs);
+            self.shade_hit(hit, &comps, depth)
         } else {
             crate::colors::BLACK
         }
+    }
+}
+
+impl Default for World {
+    fn default() -> World {
+        World::new()
     }
 }
 

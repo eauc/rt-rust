@@ -15,10 +15,10 @@ pub struct SpotLight {
 impl SpotLight {
     pub fn new(direction: Tuple, width: Float, fade: Float) -> SpotLight {
         SpotLight {
-            direction: direction,
-            width: width,
+            direction,
+            width,
             narrow_width: width * (1.0 - fade),
-            fade: fade,
+            fade,
         }
     }
 

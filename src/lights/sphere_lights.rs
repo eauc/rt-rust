@@ -13,8 +13,8 @@ pub struct SphereLight {
 impl SphereLight {
     pub fn new(size: Float, samples: usize) -> SphereLight {
         SphereLight {
-            size: size,
-            samples: samples,
+            size,
+            samples,
         }
     }
 

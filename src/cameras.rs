@@ -106,7 +106,7 @@ impl Camera {
                         let rays = self.rays_for_pixel(x, y);
                         let color = rays
                             .iter()
-                            .map(|ray| world.color_at(&ray, self.render_depth))
+                            .map(|ray| world.color_at(ray, self.render_depth))
                             .reduce(|a, b| a + b)
                             .unwrap()
                             * (1.0 / rays.len() as Float);

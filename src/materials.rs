@@ -6,7 +6,7 @@ use crate::patterns::Pattern;
 use crate::tuples::Tuple;
 use std::fmt;
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Material {
     pub pattern: Option<Pattern>,
     pub color: Color,
@@ -19,8 +19,8 @@ pub struct Material {
     pub transparency: Float,
 }
 
-impl Material {
-    pub fn default() -> Material {
+impl Default for Material {
+    fn default() -> Material {
         Material {
             pattern: None,
             color: WHITE,
@@ -33,6 +33,9 @@ impl Material {
             transparency: 0.0,
         }
     }
+}
+
+impl Material {
     pub fn glass() -> Material {
         Material {
             pattern: None,

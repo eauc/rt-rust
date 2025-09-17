@@ -26,9 +26,9 @@ pub struct Light {
 impl Light {
     fn new(light: Lights, position: Tuple, intensity: Color) -> Light {
         Light {
-            position: position,
-            intensity: intensity,
-            light: light,
+            position,
+            intensity,
+            light,
         }
     }
     pub fn new_cube(position: Tuple, intensity: Color, size: Float, samples: usize) -> Light {
