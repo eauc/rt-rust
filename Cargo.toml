@@ -7,3 +7,11 @@ edition = "2024"
 clippy = "0.0.302"
 indicatif = "0.18.0"
 rand = "0.9.2"
+
+[build]
+rustflags = ["-C", "target-cpu=native", "-C", "force-frame-pointers=yes"]
+
+[profile.release]
+debug = true
+codegen-units = 1
+lto = "fat"
