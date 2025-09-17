@@ -5,7 +5,7 @@ use crate::objects::Object;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SmoothTriangle {
     pub p1: Tuple,
     pub p2: Tuple,

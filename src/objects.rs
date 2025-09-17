@@ -5,15 +5,18 @@ use crate::matrices::Matrix;
 use crate::rays::Ray;
 use crate::shapes::Shapes;
 use crate::shapes::cones::Cone;
+use crate::shapes::csg::{Csg, Operation};
 use crate::shapes::cubes::Cube;
 use crate::shapes::cylinders::Cylinder;
 use crate::shapes::groups::Group;
 use crate::shapes::planes::Plane;
-use crate::shapes::spheres::Sphere;
 use crate::shapes::smooth_triangles::SmoothTriangle;
+use crate::shapes::spheres::Sphere;
 use crate::shapes::triangles::Triangle;
 use crate::tuples::Tuple;
+use std::ptr;
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Object {
     pub material: Material,
     pub transform: Matrix<4>,
@@ -39,6 +42,9 @@ impl Object {
     pub fn new_cone() -> Object {
         Object::new(Shapes::Cone(Cone::new()))
     }
+    pub fn new_csg(operation: Operation, left: Object, right: Object) -> Object {
+        Object::new(Shapes::Csg(Csg::new(operation, left, right)))
+    }
     pub fn new_cube() -> Object {
         Object::new(Shapes::Cube(Cube::new()))
     }
@@ -54,8 +60,17 @@ impl Object {
     pub fn new_sphere() -> Object {
         Object::new(Shapes::Sphere(Sphere::new()))
     }
-    pub fn new_smooth_triangle(p1: Tuple, p2: Tuple, p3: Tuple, n1: Tuple, n2: Tuple, n3: Tuple) -> Object {
-        Object::new(Shapes::SmoothTriangle(SmoothTriangle::new(p1, p2, p3, n1, n2, n3)))
+    pub fn new_smooth_triangle(
+        p1: Tuple,
+        p2: Tuple,
+        p3: Tuple,
+        n1: Tuple,
+        n2: Tuple,
+        n3: Tuple,
+    ) -> Object {
+        Object::new(Shapes::SmoothTriangle(SmoothTriangle::new(
+            p1, p2, p3, n1, n2, n3,
+        )))
     }
     pub fn new_triangle(p1: Tuple, p2: Tuple, p3: Tuple) -> Object {
         Object::new(Shapes::Triangle(Triangle::new(p1, p2, p3)))
@@ -71,6 +86,12 @@ impl Object {
         match &mut self.shape {
             Shapes::Cone(cone) => cone,
             _ => panic!("This object is not a cone !"),
+        }
+    }
+    pub fn as_csg(&self) -> &Csg {
+        match &self.shape {
+            Shapes::Csg(csg) => csg,
+            _ => panic!("This object is not a csg !"),
         }
     }
     pub fn as_cube(&self) -> &Cube {
@@ -154,7 +175,16 @@ impl Object {
         self.shape.prepare_bounds(&mut self.bounds);
     }
     pub fn prepare_transform(&mut self) {
-        self.shape.prepare_transform(&self.world_to_object, &self.object_to_world);
+        self.shape
+            .prepare_transform(&self.world_to_object, &self.object_to_world);
+    }
+
+    pub fn includes(&self, object: &Object) -> bool {
+        match self.shape {
+            Shapes::Csg(ref csg) => csg.includes(object),
+            Shapes::Group(ref group) => group.includes(object),
+            _ => ptr::eq(self, object),
+        }
     }
 
     pub fn world_to_object(&self, world_point: Tuple) -> Tuple {

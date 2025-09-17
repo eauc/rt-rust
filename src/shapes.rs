@@ -6,6 +6,7 @@ use crate::rays::Ray;
 use crate::tuples::Tuple;
 
 pub mod cones;
+pub mod csg;
 pub mod cubes;
 pub mod cylinders;
 pub mod groups;
@@ -14,8 +15,10 @@ pub mod smooth_triangles;
 pub mod spheres;
 pub mod triangles;
 
+#[derive(Debug, Clone, PartialEq)]
 pub enum Shapes {
     Cone(cones::Cone),
+    Csg(csg::Csg),
     Cube(cubes::Cube),
     Cylinder(cylinders::Cylinder),
     Group(groups::Group),
@@ -30,6 +33,7 @@ impl Shapes {
     pub fn prepare_bounds(&mut self, bounds: &mut Bounds) {
         match self {
             Shapes::Cone(cone) => cone.prepare_bounds(bounds),
+            Shapes::Csg(csg) => csg.prepare_bounds(bounds),
             Shapes::Cube(_) => (),
             Shapes::Cylinder(cylinder) => cylinder.prepare_bounds(bounds),
             Shapes::Group(group) => group.prepare_bounds(bounds),
@@ -43,6 +47,7 @@ impl Shapes {
 
     pub fn prepare_transform(&mut self, world_to_object: &Matrix<4>, object_to_world: &Matrix<4>) {
         match self {
+            Shapes::Csg(csg) => csg.prepare_transform(world_to_object, object_to_world),
             Shapes::Group(group) => group.prepare_transform(world_to_object, object_to_world),
             _ => (),
         }
@@ -51,6 +56,7 @@ impl Shapes {
     pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {
         match self {
             Shapes::Cone(cone) => cone.local_intersect(ray, object),
+            Shapes::Csg(csg) => csg.local_intersect(ray, object),
             Shapes::Cube(cube) => cube.local_intersect(ray, object),
             Shapes::Cylinder(cylinder) => cylinder.local_intersect(ray, object),
             Shapes::Group(group) => group.local_intersect(ray, object),
@@ -65,6 +71,7 @@ impl Shapes {
     pub fn local_normal_at(&self, point: Tuple, hit: &Intersection) -> Tuple {
         match self {
             Shapes::Cone(cone) => cone.local_normal_at(point),
+            Shapes::Csg(csg) => csg.local_normal_at(point),
             Shapes::Cube(cube) => cube.local_normal_at(point),
             Shapes::Cylinder(cylinder) => cylinder.local_normal_at(point),
             Shapes::Group(group) => group.local_normal_at(point),
@@ -77,6 +84,7 @@ impl Shapes {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct TestShape;
 
 impl TestShape {

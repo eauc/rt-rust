@@ -3,7 +3,7 @@ use crate::matrices::Matrix;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Bounds {
     pub min: Tuple,
     pub max: Tuple,

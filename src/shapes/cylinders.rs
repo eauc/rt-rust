@@ -5,6 +5,7 @@ use crate::objects::Object;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Cylinder {
     pub closed: bool,
     pub minimum: Float,

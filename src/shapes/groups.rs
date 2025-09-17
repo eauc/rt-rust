@@ -6,6 +6,7 @@ use crate::objects::Object;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Group {
     pub children: Vec<Object>,
 }
@@ -31,11 +32,7 @@ impl Group {
         // println!("new bounds: {:#?}\n", bounds);
     }
 
-    pub fn prepare_transform(
-        &mut self,
-        world_to_object: &Matrix<4>,
-        object_to_world: &Matrix<4>,
-    ) {
+    pub fn prepare_transform(&mut self, world_to_object: &Matrix<4>, object_to_world: &Matrix<4>) {
         for c in &mut self.children {
             c.world_to_object = c.transform_inverse * *world_to_object;
             c.object_to_world = *object_to_world * c.transform_inverse.transpose();
@@ -43,11 +40,16 @@ impl Group {
         }
     }
 
+    pub fn includes(&self, object: &Object) -> bool {
+        self.children.iter().any(|c| c.includes(object))
+    }
+
     pub fn local_intersect<'b>(&'b self, ray: &Ray, object: &'b Object) -> Vec<Intersection<'b>> {
         if !object.bounds.intersect(ray) {
             return vec![];
         }
-        let mut xs = self.children
+        let mut xs = self
+            .children
             .iter()
             .flat_map(|c| c.intersect(ray))
             .collect::<Vec<_>>();

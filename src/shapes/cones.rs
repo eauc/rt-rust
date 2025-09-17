@@ -5,6 +5,7 @@ use crate::objects::Object;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Cone {
     pub minimum: Float,
     pub maximum: Float,
