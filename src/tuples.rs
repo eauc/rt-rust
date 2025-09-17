@@ -1,4 +1,4 @@
-use crate::floats::{Float, equals};
+use crate::floats::{Float, equals, rand};
 use std::{cmp, ops};
 
 #[derive(Debug, Copy, Clone)]
@@ -13,6 +13,13 @@ impl Tuple {
     }
     pub fn vector(x: Float, y: Float, z: Float) -> Tuple {
         Tuple(x, y, z, 0.0)
+    }
+    pub fn random_vector(magnitude: Float) -> Tuple {
+        Tuple::vector(
+            rand(magnitude),
+            rand(magnitude),
+            rand(magnitude),
+        )
     }
     pub fn x(&self) -> Float {
         self.0

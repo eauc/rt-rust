@@ -3,11 +3,15 @@ use crate::floats::Float;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 
+mod cube_lights;
 mod point_lights;
+mod sphere_lights;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Lights {
+    Cube(cube_lights::CubeLight),
     Point,
+    Sphere(sphere_lights::SphereLight),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -18,12 +22,29 @@ pub struct Light {
 }
 
 impl Light {
-    pub fn new_point(position: Tuple, intensity: Color) -> Light {
+    fn new(light: Lights, position: Tuple, intensity: Color) -> Light {
         Light {
             position: position,
             intensity: intensity,
-            light: Lights::Point,
+            light: light,
         }
+    }
+    pub fn new_cube(position: Tuple, intensity: Color, size: Float, samples: usize) -> Light {
+        Light::new(
+            Lights::Cube(cube_lights::CubeLight::new(size, samples)),
+            position,
+            intensity,
+        )
+    }
+    pub fn new_point(position: Tuple, intensity: Color) -> Light {
+        Light::new(Lights::Point, position, intensity)
+    }
+    pub fn new_sphere(position: Tuple, intensity: Color, size: Float, samples: usize) -> Light {
+        Light::new(
+            Lights::Sphere(sphere_lights::SphereLight::new(size, samples)),
+            position,
+            intensity,
+        )
     }
 
     pub fn shadowed<T>(&self, point: Tuple, hit_fn: T) -> Light
@@ -32,7 +53,15 @@ impl Light {
     {
         Light {
             intensity: match self.light {
-                Lights::Point => point_lights::shadowed_intensity(self.position, self.intensity, point, hit_fn),
+                Lights::Cube(cube) => {
+                    cube.shadowed_intensity(self.position, self.intensity, point, hit_fn)
+                }
+                Lights::Point => {
+                    point_lights::shadowed_intensity(self.position, self.intensity, point, hit_fn)
+                }
+                Lights::Sphere(sphere) => {
+                    sphere.shadowed_intensity(self.position, self.intensity, point, hit_fn)
+                }
             },
             ..*self
         }
