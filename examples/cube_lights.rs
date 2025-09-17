@@ -19,7 +19,7 @@ fn main() {
     world.lights = vec![light];
     world.objects = vec![floor, sphere];
 
-    let camera = Camera::new(
+    let mut camera = Camera::new(
         500,
         400,
         1.0,
@@ -30,6 +30,7 @@ fn main() {
             Tuple::vector(0.0, 1.0, 0.0),
         ),
     );
+    camera.threads = 8;
 
     let image = camera.render(&mut world);
     let ppm = image.to_ppm();

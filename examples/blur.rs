@@ -41,6 +41,7 @@ fn main() {
     camera.aperture = 0.01;
     camera.blur_oversampling = 20;
     camera.oversampling = 3;
+    camera.threads = 8;
 
     let image = camera.render(&mut world);
     let ppm = image.to_ppm();

@@ -4,6 +4,7 @@ use crate::lights::Light;
 use crate::objects::Object;
 use crate::rays::Ray;
 
+#[derive(Debug, Clone)]
 pub struct World {
     pub ambient_light: Color,
     pub lights: Vec<Light>,

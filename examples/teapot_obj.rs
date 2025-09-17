@@ -19,9 +19,9 @@ fn main() {
     world.lights = vec![light];
     world.objects = vec![teapot_obj.default_group];
 
-    let camera = Camera::new(
+    let mut camera = Camera::new(
+        1000,
         800,
-        600,
         1.0,
         PI / 3.0,
         view_transform(
@@ -30,9 +30,13 @@ fn main() {
             Tuple::vector(0.0, 0.0, 1.0),
         ),
     );
+    camera.threads = 8;
+    camera.oversampling = 4;
 
+    println!("rendering low res");
     let image_low = camera.render(&mut world_low);
-    let image = camera.render(&mut world);
     std::fs::write("examples/teapot_low.ppm", image_low.to_ppm()).unwrap();
+    println!("rendering high res");
+    let image = camera.render(&mut world);
     std::fs::write("examples/teapot.ppm", image.to_ppm()).unwrap();
 }

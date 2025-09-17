@@ -36,9 +36,9 @@ fn main() {
     world.lights = vec![light];
     world.objects = vec![floor, glass, air];
 
-    let camera = Camera::new(
+    let mut camera = Camera::new(
+        1000,
         800,
-        600,
         1.0,
         PI / 3.0,
         view_transform(
@@ -47,6 +47,9 @@ fn main() {
             Tuple::vector(0.0, 0.0, 1.0),
         ),
     );
+    camera.oversampling = 4;
+    camera.render_depth = 10;
+    camera.threads = 8;
 
     let image = camera.render(&mut world);
     let ppm = image.to_ppm();

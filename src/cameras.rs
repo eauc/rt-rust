@@ -4,7 +4,11 @@ use crate::matrices::Matrix;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
 use crate::worlds::World;
+use indicatif::ProgressBar;
+use std::sync::{Arc, Mutex};
+use std::thread;
 
+#[derive(Debug, Clone, Copy)]
 pub struct Camera {
     focal_length: Float,
     pub aperture: Float,
@@ -15,7 +19,8 @@ pub struct Camera {
     pixel_size: Float,
     pub blur_oversampling: usize,
     pub oversampling: usize,
-    render_depth: usize,
+    pub render_depth: usize,
+    pub threads: usize,
     transform_inv: Matrix<4>,
 }
 
@@ -45,6 +50,7 @@ impl Camera {
             blur_oversampling: 1,
             oversampling: 2,
             render_depth: 5,
+            threads: 1,
             transform_inv: transform.inverse(),
         }
     }
@@ -82,22 +88,43 @@ impl Camera {
         rays
     }
 
-    pub fn render(&self, world: &mut World) -> Canvas {
+    pub fn render(self, world: &mut World) -> Canvas {
+        let mut world = world.clone();
         world.prepare();
-        let mut image = Canvas::new(self.hsize, self.vsize);
-        for y in 0..self.vsize {
-            for x in 0..self.hsize {
-                let rays = self.rays_for_pixel(x, y);
-                let color = rays
-                    .iter()
-                    .map(|ray| world.color_at(&ray, self.render_depth))
-                    .reduce(|a, b| a + b)
-                    .unwrap()
-                    * (1.0 / rays.len() as Float);
-                image.write_pixel(x, y, color);
-            }
+        let world = Arc::new(world);
+        let image = Arc::new(Mutex::new(Canvas::new(self.hsize, self.vsize)));
+        let mut handles = Vec::new();
+        let chunk_size = self.vsize / self.threads;
+        let pb = Arc::new(Mutex::new(ProgressBar::new(self.vsize as u64)));
+        for i in 0..self.threads {
+            let pb = Arc::clone(&pb);
+            let world = Arc::clone(&world);
+            let image = Arc::clone(&image);
+            let handle = thread::spawn(move || {
+                for y in chunk_size * i..chunk_size * (i + 1) {
+                    for x in 0..self.hsize {
+                        let rays = self.rays_for_pixel(x, y);
+                        let color = rays
+                            .iter()
+                            .map(|ray| world.color_at(&ray, self.render_depth))
+                            .reduce(|a, b| a + b)
+                            .unwrap()
+                            * (1.0 / rays.len() as Float);
+                        image.lock().unwrap().write_pixel(x, y, color);
+                    }
+                    pb.lock().unwrap().inc(1);
+                }
+            });
+            handles.push(handle);
         }
-        image
+        for handle in handles {
+            handle.join().unwrap();
+        }
+        pb.lock().unwrap().finish();
+        match Arc::try_unwrap(image) {
+            Ok(image) => image.into_inner().unwrap(),
+            Err(_) => unreachable!(),
+        }
     }
 }
 
