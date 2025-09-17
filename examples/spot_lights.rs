@@ -36,7 +36,7 @@ fn main() {
         ),
     );
 
-    let image = camera.render(&mut world, 5);
+    let image = camera.render(&mut world);
     let ppm = image.to_ppm();
     std::fs::write("examples/spot_lights.ppm", ppm).unwrap();
 }

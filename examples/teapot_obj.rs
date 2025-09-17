@@ -30,8 +30,8 @@ fn main() {
         ),
     );
 
-    let image_low = camera.render(&mut world_low, 5);
-    let image = camera.render(&mut world, 5);
+    let image_low = camera.render(&mut world_low);
+    let image = camera.render(&mut world);
     std::fs::write("examples/teapot_low.ppm", image_low.to_ppm()).unwrap();
     std::fs::write("examples/teapot.ppm", image.to_ppm()).unwrap();
 }

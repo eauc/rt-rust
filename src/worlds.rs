@@ -39,7 +39,7 @@ impl World {
         &self,
         hit: &Intersection,
         comps: &IntersectionComputations,
-        depth: u32,
+        depth: usize,
     ) -> Color {
         if depth == 0 || hit.object.material.reflective == 0.0 {
             return BLACK;
@@ -53,7 +53,7 @@ impl World {
         &self,
         hit: &Intersection,
         comps: &IntersectionComputations,
-        depth: u32,
+        depth: usize,
     ) -> Color {
         if depth == 0 || hit.object.material.transparency == 0.0 {
             return BLACK;
@@ -71,7 +71,7 @@ impl World {
         color * hit.object.material.transparency
     }
 
-    fn shade_hit(&self, hit: &Intersection, comps: &IntersectionComputations, depth: u32) -> Color {
+    fn shade_hit(&self, hit: &Intersection, comps: &IntersectionComputations, depth: usize) -> Color {
         let shadowed_lights = self
             .lights
             .iter()
@@ -105,7 +105,7 @@ impl World {
         }
     }
 
-    pub fn color_at(&self, ray: &Ray, depth: u32) -> Color {
+    pub fn color_at(&self, ray: &Ray, depth: usize) -> Color {
         let xs = self.intersect(ray);
         if let Some(hit) = intersections::hit(&xs) {
             let comps = hit.prepare_computations(&ray, &xs);

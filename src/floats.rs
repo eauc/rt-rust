@@ -9,5 +9,5 @@ pub fn equals(a: Float, b: Float) -> bool {
 }
 
 pub fn rand(magnitude: Float) -> Float {
-    magnitude * rand::rng().random_range(0.0..1.0)
+    magnitude * rand::rng().random_range(-1.0..1.0)
 }
