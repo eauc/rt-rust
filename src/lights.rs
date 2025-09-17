@@ -6,12 +6,14 @@ use crate::tuples::Tuple;
 mod cube_lights;
 mod point_lights;
 mod sphere_lights;
+mod spot_lights;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Lights {
     Cube(cube_lights::CubeLight),
     Point,
     Sphere(sphere_lights::SphereLight),
+    Spot(spot_lights::SpotLight),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -46,6 +48,19 @@ impl Light {
             intensity,
         )
     }
+    pub fn new_spot(
+        position: Tuple,
+        intensity: Color,
+        direction: Tuple,
+        width: Float,
+        fade: Float,
+    ) -> Light {
+        Light::new(
+            Lights::Spot(spot_lights::SpotLight::new(direction, width, fade)),
+            position,
+            intensity,
+        )
+    }
 
     pub fn shadowed<T>(&self, point: Tuple, hit_fn: T) -> Light
     where
@@ -61,6 +76,9 @@ impl Light {
                 }
                 Lights::Sphere(sphere) => {
                     sphere.shadowed_intensity(self.position, self.intensity, point, hit_fn)
+                }
+                Lights::Spot(spot) => {
+                    spot.shadowed_intensity(self.position, self.intensity, point, hit_fn)
                 }
             },
             ..*self
