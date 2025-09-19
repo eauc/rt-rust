@@ -1,11 +1,11 @@
 use rt_rust::cameras::Camera;
 use rt_rust::colors::Color;
+use rt_rust::floats::PI;
 use rt_rust::lights::Light;
 use rt_rust::obj_files::parse_obj_file_path;
 use rt_rust::transformations::view_transform;
 use rt_rust::tuples::Tuple;
 use rt_rust::worlds::World;
-use std::f32::consts::PI;
 
 fn main() {
     let teapot_low_obj = parse_obj_file_path("examples/teapot_low.obj");

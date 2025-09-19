@@ -1,6 +1,6 @@
 use crate::bounds::Bounds;
-use crate::floats::{EPSILON, Float};
 use crate::floats::equals;
+use crate::floats::{EPSILON, Float};
 use crate::intersections::Intersection;
 use crate::objects::Object;
 use crate::rays::Ray;

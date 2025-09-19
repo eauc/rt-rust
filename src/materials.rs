@@ -123,6 +123,7 @@ impl fmt::Debug for Material {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::floats::SQRT_2;
 
     #[test]
     fn the_default_material() {
@@ -154,7 +155,7 @@ mod tests {
     fn lighting_with_the_eye_offset_45_degrees() {
         let m = Material::default();
         let position = Tuple::point(0.0, 0.0, 0.0);
-        let eyev = Tuple::vector(0.0, (2.0_f32).sqrt() / 2.0, (2.0_f32).sqrt() / 2.0);
+        let eyev = Tuple::vector(0.0, SQRT_2 / 2.0, SQRT_2 / 2.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
         let light = Light::new_point(Tuple::point(0.0, 0.0, -10.0), WHITE);
@@ -178,7 +179,7 @@ mod tests {
     fn lighting_with_eye_in_path_of_reflection_vector() {
         let m = Material::default();
         let position = Tuple::point(0.0, 0.0, 0.0);
-        let eyev = Tuple::vector(0.0, -(2.0_f32).sqrt() / 2.0, -(2.0_f32).sqrt() / 2.0);
+        let eyev = Tuple::vector(0.0, -SQRT_2 / 2.0, -SQRT_2 / 2.0);
         let normalv = Tuple::vector(0.0, 0.0, -1.0);
         let s = Object::new_sphere();
         let light = Light::new_point(Tuple::point(0.0, 10.0, -10.0), WHITE);

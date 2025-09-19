@@ -80,6 +80,7 @@ pub fn view_transform(from: Tuple, to: Tuple, up: Tuple) -> Matrix<4> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::floats::{PI, SQRT_2};
 
     #[test]
     fn multiplying_by_a_translation_matrix() {
@@ -135,15 +136,11 @@ mod tests {
     #[test]
     fn rotating_a_point_around_the_x_axis() {
         let p = Tuple::point(0.0, 1.0, 0.0);
-        let half_quarter = rotation_x(std::f32::consts::PI / 4.0);
-        let full_quarter = rotation_x(std::f32::consts::PI / 2.0);
+        let half_quarter = rotation_x(PI / 4.0);
+        let full_quarter = rotation_x(PI / 2.0);
         assert_eq!(
             half_quarter * p,
-            Tuple::point(
-                0.0,
-                std::f32::consts::SQRT_2 / 2.0,
-                std::f32::consts::SQRT_2 / 2.0
-            )
+            Tuple::point(0.0, SQRT_2 / 2.0, SQRT_2 / 2.0)
         );
         assert_eq!(full_quarter * p, Tuple::point(0.0, 0.0, 1.0));
     }
@@ -151,30 +148,19 @@ mod tests {
     #[test]
     fn the_inverse_of_an_x_rotation_rotates_in_the_opposite_direction() {
         let p = Tuple::point(0.0, 1.0, 0.0);
-        let half_quarter = rotation_x(std::f32::consts::PI / 4.0);
+        let half_quarter = rotation_x(PI / 4.0);
         let inv = half_quarter.inverse();
-        assert_eq!(
-            inv * p,
-            Tuple::point(
-                0.0,
-                std::f32::consts::SQRT_2 / 2.0,
-                -std::f32::consts::SQRT_2 / 2.0
-            )
-        );
+        assert_eq!(inv * p, Tuple::point(0.0, SQRT_2 / 2.0, -SQRT_2 / 2.0));
     }
 
     #[test]
     fn rotating_a_point_around_the_y_axis() {
         let p = Tuple::point(0.0, 0.0, 1.0);
-        let half_quarter = rotation_y(std::f32::consts::PI / 4.0);
-        let full_quarter = rotation_y(std::f32::consts::PI / 2.0);
+        let half_quarter = rotation_y(PI / 4.0);
+        let full_quarter = rotation_y(PI / 2.0);
         assert_eq!(
             half_quarter * p,
-            Tuple::point(
-                std::f32::consts::SQRT_2 / 2.0,
-                0.0,
-                std::f32::consts::SQRT_2 / 2.0
-            )
+            Tuple::point(SQRT_2 / 2.0, 0.0, SQRT_2 / 2.0)
         );
         assert_eq!(full_quarter * p, Tuple::point(1.0, 0.0, 0.0));
     }
@@ -182,15 +168,11 @@ mod tests {
     #[test]
     fn rotating_a_point_around_the_z_axis() {
         let p = Tuple::point(0.0, 1.0, 0.0);
-        let half_quarter = rotation_z(std::f32::consts::PI / 4.0);
-        let full_quarter = rotation_z(std::f32::consts::PI / 2.0);
+        let half_quarter = rotation_z(PI / 4.0);
+        let full_quarter = rotation_z(PI / 2.0);
         assert_eq!(
             half_quarter * p,
-            Tuple::point(
-                -std::f32::consts::SQRT_2 / 2.0,
-                std::f32::consts::SQRT_2 / 2.0,
-                0.0
-            )
+            Tuple::point(-SQRT_2 / 2.0, SQRT_2 / 2.0, 0.0)
         );
         assert_eq!(full_quarter * p, Tuple::point(-1.0, 0.0, 0.0));
     }
@@ -232,7 +214,7 @@ mod tests {
     #[test]
     fn individual_transformations_are_applied_in_sequence() {
         let p = Tuple::point(1.0, 0.0, 1.0);
-        let a = rotation_x(std::f32::consts::PI / 2.0);
+        let a = rotation_x(PI / 2.0);
         let b = scaling(5.0, 5.0, 5.0);
         let c = translation(10.0, 5.0, 7.0);
         let p2 = a * p;
@@ -246,7 +228,7 @@ mod tests {
     #[test]
     fn chained_transformations_must_be_applied_in_reverse_order() {
         let p = Tuple::point(1.0, 0.0, 1.0);
-        let a = rotation_x(std::f32::consts::PI / 2.0);
+        let a = rotation_x(PI / 2.0);
         let b = scaling(5.0, 5.0, 5.0);
         let c = translation(10.0, 5.0, 7.0);
         let t = c * b * a;

@@ -1,4 +1,4 @@
-use crate::floats::{EPSILON, Float};
+use crate::floats::{Float, EPSILON};
 use crate::objects::Object;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
@@ -113,6 +113,7 @@ pub fn schlick(comps: &IntersectionComputations) -> Float {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::floats::{equals, SQRT_2};
     use crate::matrices::Matrix;
     use crate::transformations::{scaling, translation};
 
@@ -211,13 +212,13 @@ mod tests {
     fn precomputing_the_reflection_vector() {
         let object = Object::new_plane();
         let position = Tuple::point(0.0, 1.0, 0.0);
-        let eyev = Tuple::vector(0.0, -(2.0_f32).sqrt() / 2.0, (2.0_f32).sqrt() / 2.0);
+        let eyev = Tuple::vector(0.0, -SQRT_2 / 2.0, SQRT_2 / 2.0);
         let r = Ray::new(position, eyev);
         let i = Intersection::new(1.0, &object);
         let comps = i.prepare_computations(&r, &vec![]);
         assert_eq!(
             comps.reflectv,
-            Tuple::vector(0.0, 2.0_f32.sqrt() / 2.0, 2.0_f32.sqrt() / 2.0)
+            Tuple::vector(0.0, SQRT_2 / 2.0, SQRT_2 / 2.0)
         );
     }
 
@@ -279,12 +280,12 @@ mod tests {
             .made_of_glass()
             .with_transform(Matrix::identity());
         let r = Ray::new(
-            Tuple::point(0.0, 0.0, 2.0_f32.sqrt() / 2.0),
+            Tuple::point(0.0, 0.0, SQRT_2 / 2.0),
             Tuple::vector(0.0, 1.0, 0.0),
         );
         let xs = vec![
-            Intersection::new(-(2.0_f32).sqrt() / 2.0, &object),
-            Intersection::new((2.0_f32).sqrt() / 2.0, &object),
+            Intersection::new(-SQRT_2 / 2.0, &object),
+            Intersection::new(SQRT_2 / 2.0, &object),
         ];
         let comps = xs[1].prepare_computations(&r, &xs);
         let reflectance = schlick(&comps);
@@ -303,7 +304,7 @@ mod tests {
         ];
         let comps = xs[1].prepare_computations(&r, &xs);
         let reflectance = schlick(&comps);
-        assert_eq!(reflectance, 0.040000003);
+        assert!(equals(reflectance, 0.04));
     }
 
     #[test]
@@ -315,7 +316,7 @@ mod tests {
         let xs = vec![Intersection::new(1.8589, &object)];
         let comps = xs[0].prepare_computations(&r, &xs);
         let reflectance = schlick(&comps);
-        assert_eq!(reflectance, 0.48873067);
+        assert!(equals(reflectance, 0.48873067));
     }
 
     #[test]

@@ -1,4 +1,4 @@
-use crate::floats::{EPSILON, Float};
+use crate::floats::{Float, EPSILON};
 use crate::intersections::Intersection;
 use crate::objects::Object;
 use crate::rays::Ray;

@@ -1,12 +1,12 @@
 use rt_rust::cameras::Camera;
 use rt_rust::colors::WHITE;
+use rt_rust::floats::PI;
 use rt_rust::lights::Light;
 use rt_rust::matrices::Matrix;
 use rt_rust::objects::Object;
 use rt_rust::transformations::{translation, view_transform};
 use rt_rust::tuples::Tuple;
 use rt_rust::worlds::World;
-use std::f32::consts::PI;
 
 fn main() {
     let floor = Object::new_plane().with_transform(Matrix::identity());

@@ -212,9 +212,9 @@ impl Object {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::floats::{PI, SQRT_3};
     use crate::shapes::TestShape;
     use crate::transformations::{rotation_y, scaling, translation};
-    use std::f32::consts::PI;
 
     fn new_test() -> Object {
         Object::new(Shapes::Test(TestShape))
@@ -276,11 +276,7 @@ mod tests {
         g1.as_mut_group().add_child(g2);
         g1.prepare();
         let s = &g1.as_group().children[0].as_group().children[0];
-        let v = s.normal_to_world(Tuple::vector(
-            (3.0_f32).sqrt() / 3.0,
-            (3.0_f32).sqrt() / 3.0,
-            (3.0_f32).sqrt() / 3.0,
-        ));
+        let v = s.normal_to_world(Tuple::vector(SQRT_3 / 3.0, SQRT_3 / 3.0, SQRT_3 / 3.0));
         assert_eq!(v, Tuple::vector(0.28571427, 0.42857143, -0.8571));
     }
 

@@ -1,5 +1,5 @@
 use crate::bounds::Bounds;
-use crate::floats::{EPSILON, Float, equals};
+use crate::floats::{equals, Float, EPSILON};
 use crate::intersections::Intersection;
 use crate::objects::Object;
 use crate::rays::Ray;

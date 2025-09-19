@@ -75,6 +75,7 @@ impl SmoothTriangle {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::floats::equals;
 
     fn background() -> Object {
         let p1 = Tuple::point(0.0, 1.0, 0.0);
@@ -102,8 +103,8 @@ mod tests {
         let tri = background();
         let r = Ray::new(Tuple::point(-0.2, 0.3, -2.0), Tuple::vector(0.0, 0.0, 1.0));
         let xs = tri.as_smooth_triangle().local_intersect(&r, &tri);
-        assert_eq!(xs[0].u, 0.45);
-        assert_eq!(xs[0].v, 0.25);
+        assert!(equals(xs[0].u, 0.45));
+        assert!(equals(xs[0].v, 0.25));
     }
 
     #[test]

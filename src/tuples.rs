@@ -1,4 +1,4 @@
-use crate::floats::{Float, equals, rand};
+use crate::floats::{equals, rand, Float};
 use std::{cmp, ops};
 
 #[derive(Debug, Copy, Clone)]
@@ -145,6 +145,7 @@ impl ops::Div<Float> for Tuple {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::floats::SQRT_2;
 
     #[test]
     fn a_tuple_with_w_1_is_a_point() {
@@ -308,7 +309,11 @@ mod tests {
     #[test]
     fn reflecting_a_vector_off_a_slanted_surface() {
         let v = Tuple::vector(0.0, -1.0, 0.0);
-        let n = Tuple::vector(2.0_f32.sqrt() / 2.0, 2.0_f32.sqrt() / 2.0, 0.0);
+        let n = Tuple::vector(
+            SQRT_2 / 2.0,
+            SQRT_2 / 2.0,
+            0.0,
+        );
         let r = v.reflect(n);
         assert_eq!(r, Tuple::vector(1.0, 0.0, 0.0));
     }

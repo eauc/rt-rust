@@ -123,6 +123,7 @@ impl Default for World {
 pub mod tests {
     use super::*;
     use crate::colors::BLACK;
+    use crate::floats::{Float, SQRT_2};
     use crate::patterns::Pattern;
     use crate::transformations::{scaling, translation};
     use crate::tuples::Tuple;
@@ -242,9 +243,9 @@ pub mod tests {
         w.objects.push(shape);
         let r = Ray::new(
             Tuple::point(0.0, 0.0, -3.0),
-            Tuple::vector(0.0, -(2.0_f32).sqrt() / 2.0, (2.0_f32).sqrt() / 2.0),
+            Tuple::vector(0.0, -SQRT_2 / 2.0, SQRT_2 / 2.0),
         );
-        let i = Intersection::new((2.0_f32).sqrt(), &w.objects[2]);
+        let i = Intersection::new(SQRT_2, &w.objects[2]);
         let comps = i.prepare_computations(&r, &vec![]);
         let color = w.reflected_color(&i, &comps, 1);
         assert_eq!(color, Color::new(0.19032222, 0.23791526, 0.14274));
@@ -258,9 +259,9 @@ pub mod tests {
         w.objects.push(shape);
         let r = Ray::new(
             Tuple::point(0.0, 0.0, -3.0),
-            Tuple::vector(0.0, -(2.0_f32).sqrt() / 2.0, (2.0_f32).sqrt() / 2.0),
+            Tuple::vector(0.0, -SQRT_2 / 2.0, SQRT_2 / 2.0),
         );
-        let i = Intersection::new((2.0_f32).sqrt(), &w.objects[2]);
+        let i = Intersection::new(SQRT_2, &w.objects[2]);
         let comps = i.prepare_computations(&r, &vec![]);
         let color = w.reflected_color(&i, &comps, 0);
         assert_eq!(color, BLACK);
@@ -274,9 +275,9 @@ pub mod tests {
         w.objects.push(shape);
         let r = Ray::new(
             Tuple::point(0.0, 0.0, -3.0),
-            Tuple::vector(0.0, -(2.0_f32).sqrt() / 2.0, (2.0_f32).sqrt() / 2.0),
+            Tuple::vector(0.0, -SQRT_2 / 2.0, SQRT_2 / 2.0),
         );
-        let i = Intersection::new((2.0_f32).sqrt(), &w.objects[2]);
+        let i = Intersection::new(SQRT_2, &w.objects[2]);
         let comps = i.prepare_computations(&r, &vec![]);
         let color = w.shade_hit(&i, &comps, 1);
         assert_eq!(color, Color::new(0.8767573, 0.924340374, 0.8291743));
@@ -339,12 +340,12 @@ pub mod tests {
         w.objects[0].material.refractive_index = 1.5;
         let object = &w.objects[0];
         let r = Ray::new(
-            Tuple::point(0.0, 0.0, 2.0_f32.sqrt() / 2.0),
+            Tuple::point(0.0, 0.0, SQRT_2 / 2.0),
             Tuple::vector(0.0, 1.0, 0.0),
         );
         let xs = vec![
-            Intersection::new(-(2.0_f32).sqrt() / 2.0, object),
-            Intersection::new((2.0_f32).sqrt() / 2.0, object),
+            Intersection::new(-SQRT_2 / 2.0, object),
+            Intersection::new(SQRT_2 / 2.0, object),
         ];
         let comps = xs[1].prepare_computations(&r, &xs);
         let c = w.refracted_color(&xs[1], &comps, 5);
@@ -383,9 +384,9 @@ pub mod tests {
         w.objects.push(ball);
         let r = Ray::new(
             Tuple::point(0.0, 0.0, -3.0),
-            Tuple::vector(0.0, -2.0_f32.sqrt() / 2.0, 2.0_f32.sqrt() / 2.0),
+            Tuple::vector(0.0, -SQRT_2 / 2.0, SQRT_2 / 2.0),
         );
-        let i = Intersection::new(2.0_f32.sqrt(), &w.objects[2]);
+        let i = Intersection::new(SQRT_2, &w.objects[2]);
         let xs = vec![i];
         let comps = xs[0].prepare_computations(&r, &xs);
         let c = w.shade_hit(&xs[0], &comps, 5);
@@ -406,9 +407,9 @@ pub mod tests {
         w.objects.push(ball);
         let r = Ray::new(
             Tuple::point(0.0, 0.0, -3.0),
-            Tuple::vector(0.0, -2.0_f32.sqrt() / 2.0, 2.0_f32.sqrt() / 2.0),
+            Tuple::vector(0.0, -SQRT_2 / 2.0, SQRT_2 / 2.0),
         );
-        let i = Intersection::new(2.0_f32.sqrt(), &w.objects[2]);
+        let i = Intersection::new(SQRT_2, &w.objects[2]);
         let xs = vec![i];
         let comps = xs[0].prepare_computations(&r, &xs);
         let c = w.shade_hit(&xs[0], &comps, 5);

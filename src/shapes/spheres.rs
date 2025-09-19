@@ -39,6 +39,7 @@ impl Default for Sphere {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::floats::SQRT_3;
 
     #[test]
     fn a_ray_intersects_a_sphere_at_two_points() {
@@ -104,29 +105,14 @@ mod tests {
     #[test]
     fn the_normal_on_a_sphere_at_a_nonaxial_point() {
         let s = Sphere::new();
-        let n = s.local_normal_at(Tuple::point(
-            (3.0_f32).sqrt() / 3.0,
-            (3.0_f32).sqrt() / 3.0,
-            (3.0_f32).sqrt() / 3.0,
-        ));
-        assert_eq!(
-            n,
-            Tuple::vector(
-                (3.0_f32).sqrt() / 3.0,
-                (3.0_f32).sqrt() / 3.0,
-                (3.0_f32).sqrt() / 3.0
-            )
-        );
+        let n = s.local_normal_at(Tuple::point(SQRT_3 / 3.0, SQRT_3 / 3.0, SQRT_3 / 3.0));
+        assert_eq!(n, Tuple::vector(SQRT_3 / 3.0, SQRT_3 / 3.0, SQRT_3 / 3.0));
     }
 
     #[test]
     fn the_normal_is_a_normalized_vector() {
         let s = Sphere::new();
-        let n = s.local_normal_at(Tuple::point(
-            (3.0_f32).sqrt() / 3.0,
-            (3.0_f32).sqrt() / 3.0,
-            (3.0_f32).sqrt() / 3.0,
-        ));
+        let n = s.local_normal_at(Tuple::point(SQRT_3 / 3.0, SQRT_3 / 3.0, SQRT_3 / 3.0));
         assert_eq!(n, n.normalize());
     }
 }

@@ -1,12 +1,12 @@
 use rt_rust::cameras::Camera;
 use rt_rust::colors::Color;
+use rt_rust::floats::PI;
 use rt_rust::lights::Light;
 use rt_rust::objects::Object;
 use rt_rust::patterns::Pattern;
 use rt_rust::transformations::{rotation_y, scaling, translation, view_transform};
 use rt_rust::tuples::Tuple;
 use rt_rust::worlds::World;
-use std::f32::consts::PI;
 
 fn main() {
     let mut floor = Object::new_plane();

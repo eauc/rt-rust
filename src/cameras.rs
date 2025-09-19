@@ -130,9 +130,9 @@ impl Camera {
 mod tests {
     use super::*;
     use crate::colors::Color;
+    use crate::floats::{PI, SQRT_2, equals};
     use crate::transformations::{rotation_y, translation, view_transform};
     use crate::worlds::tests::default_world;
-    use std::f32::consts::PI;
 
     #[test]
     fn constructing_a_camera() {
@@ -147,13 +147,13 @@ mod tests {
     #[test]
     fn the_pixel_size_for_a_horizontal_canvas() {
         let c = Camera::new(200, 125, 1.0, PI / 2.0, Matrix::identity());
-        assert_eq!(c.pixel_size, 0.01);
+        assert!(equals(c.pixel_size, 0.01));
     }
 
     #[test]
     fn the_pixel_size_for_a_vertical_canvas() {
         let c = Camera::new(125, 200, 1.0, PI / 2.0, Matrix::identity());
-        assert_eq!(c.pixel_size, 0.01);
+        assert!(equals(c.pixel_size, 0.01));
     }
 
     #[test]
@@ -189,10 +189,7 @@ mod tests {
         let rs = c.rays_for_pixel(100, 50);
         let r = &rs[0];
         assert_eq!(r.origin, Tuple::point(0.0, 2.0, -5.0));
-        assert_eq!(
-            r.direction,
-            Tuple::vector(2.0_f32.sqrt() / 2.0, 0.0, -2.0_f32.sqrt() / 2.0)
-        );
+        assert_eq!(r.direction, Tuple::vector(SQRT_2 / 2.0, 0.0, -SQRT_2 / 2.0));
     }
 
     #[test]

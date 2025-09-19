@@ -1,4 +1,4 @@
-use crate::floats::{Float, equals};
+use crate::floats::{equals, Float};
 use std::{cmp, ops};
 
 #[derive(Debug, Copy, Clone)]

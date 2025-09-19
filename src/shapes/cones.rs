@@ -111,6 +111,7 @@ fn check_cap(ray: &Ray, t: Float, radius: Float) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::floats::SQRT_2;
 
     #[test]
     fn intersecting_a_cone_with_a_ray() {
@@ -133,7 +134,9 @@ mod tests {
         for i in 0..origins.len() {
             let r = Ray::new(origins[i], directions[i].normalize());
             let xs = shape.as_cone().local_intersect(&r, &shape);
-            assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), results[i]);
+            assert_eq!(xs.len(), results[i].len());
+            assert!(equals(xs[0].t, results[i][0]));
+            assert!(equals(xs[1].t, results[i][1]));
         }
     }
 
@@ -145,7 +148,8 @@ mod tests {
             Tuple::vector(0.0, 1.0, 1.0).normalize(),
         );
         let xs = shape.as_cone().local_intersect(&r, &shape);
-        assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![0.35355338]);
+        assert_eq!(xs.len(), 1);
+        assert!(equals(xs[0].t, 0.35355338));
     }
 
     #[test]
@@ -182,7 +186,7 @@ mod tests {
         ];
         let normals = vec![
             Tuple::vector(0.0, 0.0, 0.0),
-            Tuple::vector(1.0, -((2.0_f32).sqrt()), 1.0),
+            Tuple::vector(1.0, -SQRT_2, 1.0),
             Tuple::vector(-1.0, 1.0, 0.0),
         ];
         for i in 0..points.len() {

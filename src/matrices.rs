@@ -1,4 +1,4 @@
-use crate::floats::{Float, equals};
+use crate::floats::{equals, Float};
 use crate::tuples::Tuple;
 use std::{cmp, ops};
 
