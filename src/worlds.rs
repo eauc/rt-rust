@@ -27,11 +27,10 @@ impl World {
     }
 
     fn intersect<'a>(&'a self, ray: &Ray) -> Vec<Intersection<'a>> {
-        let mut intersections = self
-            .objects
-            .iter()
-            .flat_map(|o| o.intersect(ray))
-            .collect::<Vec<Intersection>>();
+        let mut intersections = Vec::with_capacity(self.objects.len() * 2);
+        for o in &self.objects {
+            o.intersect(ray, &mut intersections);
+        }
         intersections.sort_by(|i1, i2| i1.t.partial_cmp(&i2.t).unwrap());
         intersections
     }

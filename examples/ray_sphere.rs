@@ -22,8 +22,9 @@ fn main() {
             let world_x = -half + pixel_size * x as Float;
             let position = Tuple::point(world_x, world_y, wall_z);
             let ray = Ray::new(ray_origin, (position - ray_origin).normalize());
-            let xs = sphere.intersect(&ray);
-            if let Some(_) = intersections::hit(&xs) {
+            let mut xs = Vec::new();
+            sphere.intersect(&ray, &mut xs);
+            if intersections::hit(&xs).is_some() {
                 canvas.write_pixel(x, y, red);
             }
         }

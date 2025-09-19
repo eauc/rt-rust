@@ -29,11 +29,14 @@ impl Cylinder {
         bounds.min = Tuple::point(-1.0, self.minimum, -1.0);
         bounds.max = Tuple::point(1.0, self.maximum, 1.0);
     }
-    pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {
-        let mut xs = Vec::with_capacity(4);
-        self.intersect_sides(ray, &mut xs);
-        self.intersect_caps(ray, &mut xs);
-        xs.iter().map(|t| Intersection::new(*t, object)).collect()
+    pub fn local_intersect<'a>(
+        &'a self,
+        ray: &Ray,
+        object: &'a Object,
+        xs: &mut Vec<Intersection<'a>>,
+    ) {
+        self.intersect_sides(ray, object, xs);
+        self.intersect_caps(ray, object, xs);
     }
     pub fn local_normal_at(&self, local_point: Tuple) -> Tuple {
         let dist = local_point.x().powi(2) + local_point.z().powi(2);
@@ -45,20 +48,25 @@ impl Cylinder {
         }
         Tuple::vector(local_point.x(), 0.0, local_point.z())
     }
-    fn intersect_caps(&self, ray: &Ray, xs: &mut Vec<Float>) {
+    fn intersect_caps<'a>(&'a self, ray: &Ray, object: &'a Object, xs: &mut Vec<Intersection<'a>>) {
         if !self.closed || equals(ray.direction.y(), 0.0) {
             return;
         }
         let t = (self.minimum - ray.origin.y()) / ray.direction.y();
         if check_cap(ray, t) {
-            xs.push(t);
+            xs.push(Intersection::new(t, object));
         }
         let t = (self.maximum - ray.origin.y()) / ray.direction.y();
         if check_cap(ray, t) {
-            xs.push(t);
+            xs.push(Intersection::new(t, object));
         }
     }
-    fn intersect_sides(&self, ray: &Ray, xs: &mut Vec<Float>) {
+    fn intersect_sides<'a>(
+        &'a self,
+        ray: &Ray,
+        object: &'a Object,
+        xs: &mut Vec<Intersection<'a>>,
+    ) {
         let a = ray.direction.x().powi(2) + ray.direction.z().powi(2);
         if equals(a, 0.0) {
             return;
@@ -74,11 +82,11 @@ impl Cylinder {
         let (t0, t1) = (t0.min(t1), t0.max(t1));
         let y0 = ray.origin.y() + t0 * ray.direction.y();
         if self.minimum < y0 && y0 < self.maximum {
-            xs.push(t0);
+            xs.push(Intersection::new(t0, object));
         }
         let y1 = ray.origin.y() + t1 * ray.direction.y();
         if self.minimum < y1 && y1 < self.maximum {
-            xs.push(t1);
+            xs.push(Intersection::new(t1, object));
         }
     }
 }
@@ -115,7 +123,8 @@ mod tests {
         ];
         for (origin, direction) in origins.iter().zip(directions.iter()) {
             let r = Ray::new(*origin, *direction);
-            let xs = cyl.as_cylinder().local_intersect(&r, &cyl);
+            let mut xs = Vec::new();
+            cyl.as_cylinder().local_intersect(&r, &cyl, &mut xs);
             assert_eq!(xs.len(), 0);
         }
     }
@@ -193,7 +202,8 @@ mod tests {
         let counts = vec![0, 0, 0, 0, 0, 2];
         for i in 0..points.len() {
             let r = Ray::new(points[i], directions[i].normalize());
-            let xs = cyl.as_cylinder().local_intersect(&r, &cyl);
+            let mut xs = Vec::new();
+            cyl.as_cylinder().local_intersect(&r, &cyl, &mut xs);
             assert_eq!(xs.len(), counts[i]);
         }
     }
@@ -227,7 +237,8 @@ mod tests {
         let counts = vec![2, 2, 2, 2, 2];
         for i in 0..points.len() {
             let r = Ray::new(points[i], directions[i].normalize());
-            let xs = cyl.as_cylinder().local_intersect(&r, &cyl);
+            let mut xs = Vec::new();
+            cyl.as_cylinder().local_intersect(&r, &cyl, &mut xs);
             assert_eq!(xs.len(), counts[i]);
         }
     }

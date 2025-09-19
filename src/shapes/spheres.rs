@@ -11,18 +11,24 @@ impl Sphere {
         Sphere
     }
 
-    pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {
+    pub fn local_intersect<'a>(
+        &'a self,
+        ray: &Ray,
+        object: &'a Object,
+        xs: &mut Vec<Intersection<'a>>,
+    ) {
         let sphere_to_ray = ray.origin - Tuple::point(0.0, 0.0, 0.0);
         let a = ray.direction.dot(ray.direction);
         let b = 2.0 * ray.direction.dot(sphere_to_ray);
         let c = sphere_to_ray.dot(sphere_to_ray) - 1.0;
         let discriminant = b * b - 4.0 * a * c;
         if discriminant < 0.0 {
-            return vec![];
+            return;
         }
         let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
         let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
-        vec![Intersection::new(t1, object), Intersection::new(t2, object)]
+        xs.push(Intersection::new(t1, object));
+        xs.push(Intersection::new(t2, object));
     }
 
     pub fn local_normal_at(&self, local_point: Tuple) -> Tuple {
@@ -45,7 +51,8 @@ mod tests {
     fn a_ray_intersects_a_sphere_at_two_points() {
         let r = Ray::new(Tuple::point(0.0, 0.0, -5.0), Tuple::vector(0.0, 0.0, 1.0));
         let s = Object::new_sphere();
-        let xs = s.as_sphere().local_intersect(&r, &s);
+        let mut xs = Vec::new();
+        s.as_sphere().local_intersect(&r, &s, &mut xs);
         assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![4.0, 6.0]);
     }
 
@@ -53,7 +60,8 @@ mod tests {
     fn a_ray_intersects_a_sphere_at_a_tangent() {
         let r = Ray::new(Tuple::point(0.0, 1.0, -5.0), Tuple::vector(0.0, 0.0, 1.0));
         let s = Object::new_sphere();
-        let xs = s.as_sphere().local_intersect(&r, &s);
+        let mut xs = Vec::new();
+        s.as_sphere().local_intersect(&r, &s, &mut xs);
         assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![5.0, 5.0]);
     }
 
@@ -61,7 +69,8 @@ mod tests {
     fn a_ray_misses_a_sphere() {
         let r = Ray::new(Tuple::point(0.0, 2.0, -5.0), Tuple::vector(0.0, 0.0, 1.0));
         let s = Object::new_sphere();
-        let xs = s.as_sphere().local_intersect(&r, &s);
+        let mut xs = Vec::new();
+        s.as_sphere().local_intersect(&r, &s, &mut xs);
         assert_eq!(xs.len(), 0);
     }
 
@@ -69,7 +78,8 @@ mod tests {
     fn a_ray_originates_inside_a_sphere() {
         let r = Ray::new(Tuple::point(0.0, 0.0, 0.0), Tuple::vector(0.0, 0.0, 1.0));
         let s = Object::new_sphere();
-        let xs = s.as_sphere().local_intersect(&r, &s);
+        let mut xs = Vec::new();
+        s.as_sphere().local_intersect(&r, &s, &mut xs);
         assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![-1.0, 1.0]);
     }
 
@@ -77,7 +87,8 @@ mod tests {
     fn a_sphere_is_behind_a_ray() {
         let r = Ray::new(Tuple::point(0.0, 0.0, 5.0), Tuple::vector(0.0, 0.0, 1.0));
         let s = Object::new_sphere();
-        let xs = s.as_sphere().local_intersect(&r, &s);
+        let mut xs = Vec::new();
+        s.as_sphere().local_intersect(&r, &s, &mut xs);
         assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![-6.0, -4.0]);
     }
 

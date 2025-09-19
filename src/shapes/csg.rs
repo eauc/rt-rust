@@ -49,14 +49,18 @@ impl Csg {
         self.children.iter().any(|c| c.includes(object))
     }
 
-    pub fn local_intersect<'a>(&'a self, ray: &Ray, _object: &'a Object) -> Vec<Intersection<'a>> {
-        let mut xs = self
-            .children
-            .iter()
-            .flat_map(|c| c.intersect(ray))
-            .collect::<Vec<_>>();
-        xs.sort_by(|a, b| a.t.partial_cmp(&b.t).unwrap());
-        self.filter_intersections(xs)
+    pub fn local_intersect<'a>(
+        &'a self,
+        ray: &Ray,
+        _object: &'a Object,
+        xs: &mut Vec<Intersection<'a>>,
+    ) {
+        let mut xxs = Vec::with_capacity(self.children.len() * 2);
+        for c in &self.children {
+            c.intersect(ray, &mut xxs);
+        }
+        xxs.sort_by(|a, b| a.t.partial_cmp(&b.t).unwrap());
+        xs.extend(self.filter_intersections(xxs));
     }
 
     pub fn local_normal_at(&self, _point: Tuple) -> Tuple {
@@ -165,7 +169,8 @@ mod tests {
         let s2 = Object::new_cube();
         let c = Object::new_csg(Operation::Union, s1, s2);
         let r = Ray::new(Tuple::point(0.0, 2.0, -5.0), Tuple::vector(0.0, 0.0, 1.0));
-        let xs = c.as_csg().local_intersect(&r, &c);
+        let mut xs = Vec::new();
+        c.as_csg().local_intersect(&r, &c, &mut xs);
         assert_eq!(xs.len(), 0);
     }
 
@@ -175,7 +180,8 @@ mod tests {
         let s2 = Object::new_sphere().with_transform(translation(0.0, 0.0, 0.5));
         let c = Object::new_csg(Operation::Union, s1, s2);
         let r = Ray::new(Tuple::point(0.0, 0.0, -5.0), Tuple::vector(0.0, 0.0, 1.0));
-        let xs = c.as_csg().local_intersect(&r, &c);
+        let mut xs = Vec::new();
+        c.as_csg().local_intersect(&r, &c, &mut xs);
         assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![4.0, 6.5]);
     }
 }

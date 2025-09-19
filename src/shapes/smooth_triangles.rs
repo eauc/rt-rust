@@ -46,25 +46,30 @@ impl SmoothTriangle {
         );
     }
 
-    pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {
+    pub fn local_intersect<'a>(
+        &'a self,
+        ray: &Ray,
+        object: &'a Object,
+        xs: &mut Vec<Intersection<'a>>,
+    ) {
         let dir_cross_e2 = ray.direction.cross(self.e2);
         let det = self.e1.dot(dir_cross_e2);
         if det.abs() < EPSILON {
-            return vec![];
+            return;
         }
         let f = 1.0 / det;
         let p1_to_origin = ray.origin - self.p1;
         let u = f * p1_to_origin.dot(dir_cross_e2);
         if !(0.0..=1.0).contains(&u) {
-            return vec![];
+            return;
         }
         let origin_cross_e1 = p1_to_origin.cross(self.e1);
         let v = f * ray.direction.dot(origin_cross_e1);
         if v < 0.0 || u + v > 1.0 {
-            return vec![];
+            return;
         }
         let t = f * self.e2.dot(origin_cross_e1);
-        vec![Intersection::new_with_uv(t, object, u, v)]
+        xs.push(Intersection::new_with_uv(t, object, u, v));
     }
 
     pub fn local_normal_at(&self, _point: Tuple, hit: &Intersection) -> Tuple {
@@ -102,7 +107,8 @@ mod tests {
     fn an_intersection_with_a_smooth_triangle_stores_u_v() {
         let tri = background();
         let r = Ray::new(Tuple::point(-0.2, 0.3, -2.0), Tuple::vector(0.0, 0.0, 1.0));
-        let xs = tri.as_smooth_triangle().local_intersect(&r, &tri);
+        let mut xs = Vec::new();
+        tri.as_smooth_triangle().local_intersect(&r, &tri, &mut xs);
         assert!(equals(xs[0].u, 0.45));
         assert!(equals(xs[0].v, 0.25));
     }
@@ -111,7 +117,8 @@ mod tests {
     fn a_smooth_triangle_interpolates_the_normal() {
         let tri = background();
         let r = Ray::new(Tuple::point(-0.2, 0.3, -2.0), Tuple::vector(0.0, 0.0, 1.0));
-        let xs = tri.as_smooth_triangle().local_intersect(&r, &tri);
+        let mut xs = Vec::new();
+        tri.as_smooth_triangle().local_intersect(&r, &tri, &mut xs);
         let i = &xs[0];
         let n = tri.normal_at(Tuple::point(0.0, 0.0, 0.0), i);
         assert_eq!(n, Tuple::vector(-0.5547, 0.83205, 0.0));
@@ -121,7 +128,8 @@ mod tests {
     fn preparing_the_normal_on_a_smooth_triangle() {
         let tri = background();
         let r = Ray::new(Tuple::point(-0.2, 0.3, -2.0), Tuple::vector(0.0, 0.0, 1.0));
-        let xs = tri.as_smooth_triangle().local_intersect(&r, &tri);
+        let mut xs = Vec::new();
+        tri.as_smooth_triangle().local_intersect(&r, &tri, &mut xs);
         let i = &xs[0];
         let comps = i.prepare_computations(&r, &xs);
         assert_eq!(comps.normalv, Tuple::vector(-0.5547, 0.83205, 0.0));

@@ -19,12 +19,17 @@ impl Plane {
         bounds.max = Tuple::point(Float::INFINITY, EPSILON, Float::INFINITY);
     }
 
-    pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {
+    pub fn local_intersect<'a>(
+        &'a self,
+        ray: &Ray,
+        object: &'a Object,
+        xs: &mut Vec<Intersection<'a>>,
+    ) {
         if equals(ray.direction.y(), 0.0) {
-            return vec![];
+            return;
         }
         let t = -ray.origin.y() / ray.direction.y();
-        vec![Intersection::new(t, object)]
+        xs.push(Intersection::new(t, object));
     }
 
     pub fn local_normal_at(&self, _point: Tuple) -> Tuple {
@@ -58,7 +63,8 @@ mod tests {
     fn intersect_with_a_ray_parallel_to_the_plane() {
         let r = Ray::new(Tuple::point(0.0, 10.0, 0.0), Tuple::vector(0.0, 0.0, 1.0));
         let p = Object::new_plane();
-        let xs = p.as_plane().local_intersect(&r, &p);
+        let mut xs = Vec::new();
+        p.as_plane().local_intersect(&r, &p, &mut xs);
         assert_eq!(xs.len(), 0);
     }
 
@@ -66,7 +72,8 @@ mod tests {
     fn intersect_with_a_ray_coplanar_to_the_plane() {
         let r = Ray::new(Tuple::point(0.0, 0.0, 0.0), Tuple::vector(0.0, 0.0, 1.0));
         let p = Object::new_plane();
-        let xs = p.as_plane().local_intersect(&r, &p);
+        let mut xs = Vec::new();
+        p.as_plane().local_intersect(&r, &p, &mut xs);
         assert_eq!(xs.len(), 0);
     }
 
@@ -74,7 +81,8 @@ mod tests {
     fn a_ray_intersecting_a_plane_from_above() {
         let r = Ray::new(Tuple::point(0.0, 1.0, 0.0), Tuple::vector(0.0, -1.0, 0.0));
         let p = Object::new_plane();
-        let xs = p.as_plane().local_intersect(&r, &p);
+        let mut xs = Vec::new();
+        p.as_plane().local_intersect(&r, &p, &mut xs);
         assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![1.0]);
     }
 
@@ -82,7 +90,8 @@ mod tests {
     fn a_ray_intersecting_a_plane_from_below() {
         let r = Ray::new(Tuple::point(0.0, -1.0, 0.0), Tuple::vector(0.0, 1.0, 0.0));
         let p = Object::new_plane();
-        let xs = p.as_plane().local_intersect(&r, &p);
+        let mut xs = Vec::new();
+        p.as_plane().local_intersect(&r, &p, &mut xs);
         assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), vec![1.0]);
     }
 }

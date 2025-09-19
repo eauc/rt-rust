@@ -197,9 +197,9 @@ impl Object {
         n.normalize()
     }
 
-    pub fn intersect<'b>(&'b self, ray: &Ray) -> Vec<Intersection<'b>> {
+    pub fn intersect<'b>(&'b self, ray: &Ray, xs: &mut Vec<Intersection<'b>>) {
         let local_ray = ray.transform(self.transform_inverse);
-        self.shape.local_intersect(&local_ray, self)
+        self.shape.local_intersect(&local_ray, self, xs)
     }
 
     pub fn normal_at(&self, world_point: Tuple, hit: &Intersection) -> Tuple {
@@ -242,7 +242,8 @@ mod tests {
     fn intersecting_a_scaled_shape_with_a_ray() {
         let r = Ray::new(Tuple::point(0.0, 0.0, -5.0), Tuple::vector(0.0, 0.0, 1.0));
         let o = new_test().with_transform(scaling(2.0, 2.0, 2.0));
-        let xs = o.intersect(&r);
+        let mut xs = Vec::new();
+        o.intersect(&r, &mut xs);
         assert_eq!(xs.len(), 0);
     }
 

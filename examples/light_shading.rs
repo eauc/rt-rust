@@ -24,7 +24,8 @@ fn main() {
             let world_x = -half + pixel_size * x as Float;
             let position = Tuple::point(world_x, world_y, wall_z);
             let ray = Ray::new(ray_origin, (position - ray_origin).normalize());
-            let xs = sphere.intersect(&ray);
+            let mut xs = Vec::new();
+            sphere.intersect(&ray, &mut xs);
             if let Some(hit) = intersections::hit(&xs) {
                 let hit_point = ray.position(hit.t);
                 let normalv = hit.object.normal_at(hit_point, hit);

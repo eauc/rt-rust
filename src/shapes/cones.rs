@@ -32,11 +32,14 @@ impl Cone {
         bounds.max = Tuple::point(1.0, self.maximum, 1.0);
     }
 
-    pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {
-        let mut xs = Vec::with_capacity(4);
-        self.intersect_sides(ray, &mut xs);
-        self.intersect_caps(ray, &mut xs);
-        xs.iter().map(|t| Intersection::new(*t, object)).collect()
+    pub fn local_intersect<'a>(
+        &'a self,
+        ray: &Ray,
+        object: &'a Object,
+        xs: &mut Vec<Intersection<'a>>,
+    ) {
+        self.intersect_sides(ray, object, xs);
+        self.intersect_caps(ray, object, xs);
     }
 
     pub fn local_normal_at(&self, local_point: Tuple) -> Tuple {
@@ -53,28 +56,33 @@ impl Cone {
         Tuple::vector(local_point.x(), y, local_point.z())
     }
 
-    fn intersect_caps(&self, ray: &Ray, xs: &mut Vec<Float>) {
+    fn intersect_caps<'a>(&'a self, ray: &Ray, object: &'a Object, xs: &mut Vec<Intersection<'a>>) {
         if !self.closed || equals(ray.direction.y(), 0.0) {
             return;
         }
         let t = (self.minimum - ray.origin.y()) / ray.direction.y();
         if check_cap(ray, t, self.minimum.abs()) {
-            xs.push(t);
+            xs.push(Intersection::new(t, object));
         }
         let t = (self.maximum - ray.origin.y()) / ray.direction.y();
         if check_cap(ray, t, self.maximum.abs()) {
-            xs.push(t);
+            xs.push(Intersection::new(t, object));
         }
     }
 
-    fn intersect_sides(&self, ray: &Ray, xs: &mut Vec<Float>) {
+    fn intersect_sides<'a>(
+        &'a self,
+        ray: &Ray,
+        object: &'a Object,
+        xs: &mut Vec<Intersection<'a>>,
+    ) {
         let a = ray.direction.x().powi(2) - ray.direction.y().powi(2) + ray.direction.z().powi(2);
         let b = 2.0 * ray.origin.x() * ray.direction.x() - 2.0 * ray.origin.y() * ray.direction.y()
             + 2.0 * ray.origin.z() * ray.direction.z();
         let c = ray.origin.x().powi(2) - ray.origin.y().powi(2) + ray.origin.z().powi(2);
         if equals(a, 0.0) && !equals(b, 0.0) {
             let t = -c / (2.0 * b);
-            xs.push(t);
+            xs.push(Intersection::new(t, object));
             return;
         }
         let disc = b.powi(2) - 4.0 * a * c;
@@ -87,11 +95,11 @@ impl Cone {
         let (t0, t1) = (t0.min(t1), t0.max(t1));
         let y0 = ray.origin.y() + t0 * ray.direction.y();
         if self.minimum - EPSILON < y0 && y0 < self.maximum + EPSILON {
-            xs.push(t0);
+            xs.push(Intersection::new(t0, object));
         }
         let y1 = ray.origin.y() + t1 * ray.direction.y();
         if self.minimum - EPSILON < y1 && y1 < self.maximum + EPSILON {
-            xs.push(t1);
+            xs.push(Intersection::new(t1, object));
         }
     }
 }
@@ -133,7 +141,8 @@ mod tests {
         ];
         for i in 0..origins.len() {
             let r = Ray::new(origins[i], directions[i].normalize());
-            let xs = shape.as_cone().local_intersect(&r, &shape);
+            let mut xs = Vec::new();
+            shape.as_cone().local_intersect(&r, &shape, &mut xs);
             assert_eq!(xs.len(), results[i].len());
             assert!(equals(xs[0].t, results[i][0]));
             assert!(equals(xs[1].t, results[i][1]));
@@ -147,7 +156,8 @@ mod tests {
             Tuple::point(0.0, 0.0, -1.0),
             Tuple::vector(0.0, 1.0, 1.0).normalize(),
         );
-        let xs = shape.as_cone().local_intersect(&r, &shape);
+        let mut xs = Vec::new();
+        shape.as_cone().local_intersect(&r, &shape, &mut xs);
         assert_eq!(xs.len(), 1);
         assert!(equals(xs[0].t, 0.35355338));
     }
@@ -171,7 +181,8 @@ mod tests {
         let counts = vec![0, 2, 4];
         for i in 0..origins.len() {
             let r = Ray::new(origins[i], directions[i].normalize());
-            let xs = shape.as_cone().local_intersect(&r, &shape);
+            let mut xs = Vec::new();
+            shape.as_cone().local_intersect(&r, &shape, &mut xs);
             assert_eq!(xs.len(), counts[i]);
         }
     }

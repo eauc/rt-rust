@@ -53,19 +53,24 @@ impl Shapes {
         }
     }
 
-    pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {
+    pub fn local_intersect<'a>(
+        &'a self,
+        ray: &Ray,
+        object: &'a Object,
+        xs: &mut Vec<Intersection<'a>>,
+    ) {
         match self {
-            Shapes::Cone(cone) => cone.local_intersect(ray, object),
-            Shapes::Csg(csg) => csg.local_intersect(ray, object),
-            Shapes::Cube(cube) => cube.local_intersect(ray, object),
-            Shapes::Cylinder(cylinder) => cylinder.local_intersect(ray, object),
-            Shapes::Group(group) => group.local_intersect(ray, object),
-            Shapes::Plane(plane) => plane.local_intersect(ray, object),
-            Shapes::SmoothTriangle(triangle) => triangle.local_intersect(ray, object),
-            Shapes::Sphere(sphere) => sphere.local_intersect(ray, object),
-            Shapes::Test(test) => test.local_intersect(ray, object),
-            Shapes::Triangle(triangle) => triangle.local_intersect(ray, object),
-        }
+            Shapes::Cone(cone) => cone.local_intersect(ray, object, xs),
+            Shapes::Csg(csg) => csg.local_intersect(ray, object, xs),
+            Shapes::Cube(cube) => cube.local_intersect(ray, object, xs),
+            Shapes::Cylinder(cylinder) => cylinder.local_intersect(ray, object, xs),
+            Shapes::Group(group) => group.local_intersect(ray, object, xs),
+            Shapes::Plane(plane) => plane.local_intersect(ray, object, xs),
+            Shapes::SmoothTriangle(triangle) => triangle.local_intersect(ray, object, xs),
+            Shapes::Sphere(sphere) => sphere.local_intersect(ray, object, xs),
+            Shapes::Test(test) => test.local_intersect(ray, object, xs),
+            Shapes::Triangle(triangle) => triangle.local_intersect(ray, object, xs),
+        };
     }
 
     pub fn local_normal_at(&self, point: Tuple, hit: &Intersection) -> Tuple {
@@ -88,12 +93,11 @@ impl Shapes {
 pub struct TestShape;
 
 impl TestShape {
-    fn local_intersect<'a>(&'a self, ray: &Ray, _object: &'a Object) -> Vec<Intersection<'a>> {
+    fn local_intersect<'a>(&'a self, ray: &Ray, _object: &'a Object, _xs: &mut [Intersection<'a>]) {
         assert_eq!(
             ray,
             &Ray::new(Tuple::point(0.0, 0.0, -2.5), Tuple::vector(0.0, 0.0, 0.5))
         );
-        vec![]
     }
 
     fn local_normal_at(&self, local_point: Tuple) -> Tuple {

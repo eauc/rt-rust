@@ -12,19 +12,22 @@ impl Cube {
         Cube
     }
 
-    pub fn local_intersect<'a>(&'a self, ray: &Ray, object: &'a Object) -> Vec<Intersection<'a>> {
+    pub fn local_intersect<'a>(
+        &'a self,
+        ray: &Ray,
+        object: &'a Object,
+        xs: &mut Vec<Intersection<'a>>,
+    ) {
         let (xtmin, xtmax) = check_axis(ray.origin.x(), ray.direction.x());
         let (ytmin, ytmax) = check_axis(ray.origin.y(), ray.direction.y());
         let (ztmin, ztmax) = check_axis(ray.origin.z(), ray.direction.z());
         let tmin = xtmin.max(ytmin).max(ztmin);
         let tmax = xtmax.min(ytmax).min(ztmax);
         if tmin > tmax {
-            return vec![];
+            return;
         }
-        vec![
-            Intersection::new(tmin, object),
-            Intersection::new(tmax, object),
-        ]
+        xs.push(Intersection::new(tmin, object));
+        xs.push(Intersection::new(tmax, object));
     }
 
     pub fn local_normal_at(&self, local_point: Tuple) -> Tuple {
@@ -105,7 +108,8 @@ mod tests {
         ];
         for i in 0..origins.len() {
             let r = Ray::new(origins[i], directions[i]);
-            let xs = c.as_cube().local_intersect(&r, &c);
+            let mut xs = Vec::new();
+            c.as_cube().local_intersect(&r, &c, &mut xs);
             // println!("{:?} {:?}", origins[i], directions[i]);
             assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), results[i]);
         }
@@ -132,7 +136,8 @@ mod tests {
         ];
         for i in 0..origins.len() {
             let r = Ray::new(origins[i], directions[i]);
-            let xs = c.as_cube().local_intersect(&r, &c);
+            let mut xs = Vec::new();
+            c.as_cube().local_intersect(&r, &c, &mut xs);
             assert_eq!(xs.len(), 0);
         }
     }

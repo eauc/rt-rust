@@ -44,17 +44,19 @@ impl Group {
         self.children.iter().any(|c| c.includes(object))
     }
 
-    pub fn local_intersect<'b>(&'b self, ray: &Ray, object: &'b Object) -> Vec<Intersection<'b>> {
+    pub fn local_intersect<'b>(
+        &'b self,
+        ray: &Ray,
+        object: &'b Object,
+        xs: &mut Vec<Intersection<'b>>,
+    ) {
         if !object.bounds.intersect(ray) {
-            return vec![];
+            return;
         }
-        let mut xs = self
-            .children
-            .iter()
-            .flat_map(|c| c.intersect(ray))
-            .collect::<Vec<_>>();
-        xs.sort_by(|a, b| a.t.partial_cmp(&b.t).unwrap());
-        xs
+        for c in &self.children {
+            c.intersect(ray, xs);
+        }
+        // xs.sort_by(|a, b| a.t.partial_cmp(&b.t).unwrap());
     }
 
     pub fn local_normal_at(&self, _local_point: Tuple) -> Tuple {
@@ -78,7 +80,8 @@ mod tests {
     fn intersecting_a_ray_with_an_empty_group() {
         let r = Ray::new(Tuple::point(0.0, 0.0, 0.0), Tuple::vector(0.0, 0.0, 1.0));
         let g = Object::new_group();
-        let xs = g.as_group().local_intersect(&r, &g);
+        let mut xs = Vec::new();
+        g.as_group().local_intersect(&r, &g, &mut xs);
         assert!(xs.is_empty());
     }
 
@@ -92,7 +95,9 @@ mod tests {
         g.as_mut_group().add_child(s2);
         g.as_mut_group().add_child(s3);
         let r = Ray::new(Tuple::point(0.0, 0.0, -5.0), Tuple::vector(0.0, 0.0, 1.0));
-        let xs = g.as_group().local_intersect(&r, &g);
+        let mut xs = Vec::new();
+        g.as_group().local_intersect(&r, &g, &mut xs);
+        xs.sort_by(|a, b| a.t.partial_cmp(&b.t).unwrap());
         assert_eq!(
             xs.iter().map(|x| x.t).collect::<Vec<_>>(),
             vec![1.0, 3.0, 4.0, 6.0]
@@ -106,7 +111,8 @@ mod tests {
         g.as_mut_group().add_child(s);
         g.prepare();
         let r = Ray::new(Tuple::point(10.0, 0.0, -10.0), Tuple::vector(0.0, 0.0, 1.0));
-        let xs = g.intersect(&r);
+        let mut xs = Vec::new();
+        g.intersect(&r, &mut xs);
         assert_eq!(xs.len(), 2);
     }
 }
