@@ -9,10 +9,7 @@ pub struct RingPattern {
 
 impl RingPattern {
     pub fn new(a: Color, b: Color) -> RingPattern {
-        RingPattern {
-            a,
-            b,
-        }
+        RingPattern { a, b }
     }
 
     pub fn color_at(&self, point: Tuple) -> Color {

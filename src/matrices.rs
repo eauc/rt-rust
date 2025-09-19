@@ -425,7 +425,7 @@ mod tests {
             [9.0, 1.0, 7.0, -6.0],
         ]);
         assert_eq!(a.determinant(), -2120.0);
-        assert_eq!(a.is_invertible(), true);
+        assert!(a.is_invertible());
     }
 
     #[test]
@@ -437,7 +437,7 @@ mod tests {
             [0.0, 0.0, 0.0, 0.0],
         ]);
         assert_eq!(a.determinant(), 0.0);
-        assert_eq!(a.is_invertible(), false);
+        assert!(!a.is_invertible());
     }
 
     //  Scenario: Calculating the inverse of a matrix

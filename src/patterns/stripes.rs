@@ -9,10 +9,7 @@ pub struct StripePattern {
 
 impl StripePattern {
     pub fn new(a: Color, b: Color) -> StripePattern {
-        StripePattern {
-            a,
-            b,
-        }
+        StripePattern { a, b }
     }
 
     pub fn color_at(&self, point: Tuple) -> Color {

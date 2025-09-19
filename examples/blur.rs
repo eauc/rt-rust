@@ -16,7 +16,8 @@ fn main() {
 
     let mut red = Object::new_sphere().with_transform(translation(0.0, 1.5, 0.0));
     red.material.color = Color::new(1.0, 0.0, 0.0);
-    let mut green = Object::new_sphere().with_transform(translation(2.0, 1.0, 1.0) * scaling(0.5, 0.5, 0.5));
+    let mut green =
+        Object::new_sphere().with_transform(translation(2.0, 1.0, 1.0) * scaling(0.5, 0.5, 0.5));
     green.material.color = Color::new(0.0, 1.0, 0.0);
     let mut blue = Object::new_sphere().with_transform(translation(-3.0, 1.5, -4.0));
     blue.material.color = Color::new(0.0, 0.0, 1.0);

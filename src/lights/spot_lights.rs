@@ -1,4 +1,4 @@
-use crate::colors::{BLACK, Color};
+use crate::colors::{Color, BLACK};
 use crate::floats::Float;
 use crate::lights::point_lights;
 use crate::rays::Ray;

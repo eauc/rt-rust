@@ -3,7 +3,7 @@
 ## Lint
 
 ```bash
-cargo clippy
+cargo clippy --tests
 ```
 
 ## Tests

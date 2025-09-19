@@ -1,4 +1,4 @@
-use crate::colors::{Color};
+use crate::colors::Color;
 use crate::floats::Float;
 use crate::lights::point_lights;
 use crate::rays::Ray;
@@ -12,10 +12,7 @@ pub struct CubeLight {
 
 impl CubeLight {
     pub fn new(size: Float, samples: usize) -> CubeLight {
-        CubeLight {
-            size,
-            samples,
-        }
+        CubeLight { size, samples }
     }
 
     pub fn shadowed_intensity<T>(
@@ -30,8 +27,7 @@ impl CubeLight {
     {
         let mut n_shadowed = 0;
         for _ in 0..self.samples {
-            let light_position =
-                light_position + Tuple::random_vector(self.size);
+            let light_position = light_position + Tuple::random_vector(self.size);
             n_shadowed += if point_lights::is_shadowed(light_position, point, &hit_fn) {
                 0
             } else {

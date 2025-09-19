@@ -1,5 +1,5 @@
 use crate::canvas::Canvas;
-use crate::floats::{Float, rand};
+use crate::floats::{rand, Float};
 use crate::matrices::Matrix;
 use crate::rays::Ray;
 use crate::tuples::Tuple;
@@ -130,7 +130,7 @@ impl Camera {
 mod tests {
     use super::*;
     use crate::colors::Color;
-    use crate::floats::{PI, SQRT_2, equals};
+    use crate::floats::{equals, PI, SQRT_2};
     use crate::transformations::{rotation_y, translation, view_transform};
     use crate::worlds::tests::default_world;
 

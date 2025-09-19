@@ -45,20 +45,20 @@ mod tests {
     fn there_is_no_shadow_when_nothing_is_collinear_with_point_and_light() {
         let light_position = Tuple::point(-10.0, 10.0, -10.0);
         let p = Tuple::point(0.0, 10.0, 0.0);
-        assert_eq!(is_shadowed(light_position, p, &|_| None), false);
+        assert!(!is_shadowed(light_position, p, &|_| None));
     }
 
     #[test]
     fn there_is_a_shadow_when_an_object_is_between_the_point_and_the_light() {
         let light_position = Tuple::point(-10.0, 10.0, -10.0);
         let p = Tuple::point(10.0, -10.0, 10.0);
-        assert_eq!(is_shadowed(light_position, p, &|_| Some(1.0)), true);
+        assert!(is_shadowed(light_position, p, &|_| Some(1.0)));
     }
 
     #[test]
     fn there_is_no_shadow_when_an_object_is_behind_the_light() {
         let light_position = Tuple::point(-10.0, 10.0, -10.0);
         let p = Tuple::point(-20.0, 20.0, -20.);
-        assert_eq!(is_shadowed(light_position, p, &|_| Some(20.0)), false);
+        assert!(!is_shadowed(light_position, p, &|_| Some(20.0)));
     }
 }

@@ -1,4 +1,4 @@
-use crate::floats::{EPSILON, Float};
+use crate::floats::{Float, EPSILON};
 use crate::matrices::Matrix;
 use crate::rays::Ray;
 use crate::tuples::Tuple;

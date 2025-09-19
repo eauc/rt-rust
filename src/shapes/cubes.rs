@@ -79,7 +79,7 @@ mod tests {
     #[test]
     fn a_ray_intersects_a_cube() {
         let c = Object::new_cube();
-        let origins = vec![
+        let origins = [
             Tuple::point(5.0, 0.5, 0.0),
             Tuple::point(-5.0, 0.5, 0.0),
             Tuple::point(0.5, 5.0, 0.0),
@@ -88,7 +88,7 @@ mod tests {
             Tuple::point(0.5, 0.0, -5.0),
             Tuple::point(0.0, 0.5, 0.0),
         ];
-        let directions = vec![
+        let directions = [
             Tuple::vector(-1.0, 0.0, 0.0),
             Tuple::vector(1.0, 0.0, 0.0),
             Tuple::vector(0.0, -1.0, 0.0),
@@ -97,7 +97,7 @@ mod tests {
             Tuple::vector(0.0, 0.0, 1.0),
             Tuple::vector(0.0, 0.0, 1.0),
         ];
-        let results = vec![
+        let results = [
             vec![4.0, 6.0],
             vec![4.0, 6.0],
             vec![4.0, 6.0],
@@ -118,7 +118,7 @@ mod tests {
     #[test]
     fn a_ray_misses_a_cube() {
         let c = Object::new_cube();
-        let origins = vec![
+        let origins = [
             Tuple::point(-2.0, 0.0, 0.0),
             Tuple::point(0.0, -2.0, 0.0),
             Tuple::point(0.0, 0.0, -2.0),
@@ -126,7 +126,7 @@ mod tests {
             Tuple::point(0.0, 2.0, 2.0),
             Tuple::point(2.0, 2.0, 0.0),
         ];
-        let directions = vec![
+        let directions = [
             Tuple::vector(0.2673, 0.5345, 0.8018),
             Tuple::vector(0.8018, 0.2673, 0.5345),
             Tuple::vector(0.5345, 0.8018, 0.2673),
@@ -145,7 +145,7 @@ mod tests {
     #[test]
     fn the_normal_on_the_surface_of_a_cube() {
         let c = Cube::new();
-        let points = vec![
+        let points = [
             Tuple::point(1.0, 0.5, -0.8),
             Tuple::point(-1.0, -0.2, 0.9),
             Tuple::point(-0.4, 1.0, -0.1),
@@ -155,7 +155,7 @@ mod tests {
             Tuple::point(1.0, 1.0, 1.0),
             Tuple::point(-1.0, -1.0, -1.0),
         ];
-        let normals = vec![
+        let normals = [
             Tuple::vector(1.0, 0.0, 0.0),
             Tuple::vector(-1.0, 0.0, 0.0),
             Tuple::vector(0.0, 1.0, 0.0),

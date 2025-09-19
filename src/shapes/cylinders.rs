@@ -111,12 +111,12 @@ mod tests {
     #[test]
     fn a_ray_misses_a_cylinder() {
         let cyl = Object::new_cylinder();
-        let origins = vec![
+        let origins = [
             Tuple::point(1.0, 0.0, 0.0),
             Tuple::point(0.0, 0.0, 0.0),
             Tuple::point(0.0, 0.0, -5.0),
         ];
-        let directions = vec![
+        let directions = [
             Tuple::vector(0.0, 1.0, 0.0),
             Tuple::vector(0.0, 1.0, 0.0),
             Tuple::vector(1.0, 1.0, 1.0),
@@ -132,34 +132,37 @@ mod tests {
     #[test]
     fn a_ray_strikes_a_cylinder() {
         let cyl = Object::new_cylinder();
-        let origins = vec![
+        let origins = [
             Tuple::point(1.0, 0.0, -5.0),
             Tuple::point(0.0, 0.0, -5.0),
             Tuple::point(0.5, 0.0, -5.0),
         ];
-        let directions = vec![
+        let directions = [
             Tuple::vector(0.0, 0.0, 1.0),
             Tuple::vector(0.0, 0.0, 1.0),
             Tuple::vector(0.1, 1.0, 1.0),
         ];
-        let results = vec![vec![5.0, 5.0], vec![4.0, 6.0], vec![4.801988, 4.999992]];
+        let results = [[5.0, 5.0], [4.0, 6.0], [4.801988, 4.999992]];
         for i in 0..origins.len() {
             let r = Ray::new(origins[i], directions[i]);
-            let xs = cyl.as_cylinder().local_intersect(&r, &cyl);
-            assert_eq!(xs.iter().map(|x| x.t).collect::<Vec<_>>(), results[i]);
+            let mut xs = Vec::new();
+            cyl.as_cylinder().local_intersect(&r, &cyl, &mut xs);
+            assert_eq!(xs.len(), 2);
+            assert!(equals(xs[0].t, results[i][0]));
+            assert!(equals(xs[1].t, results[i][1]));
         }
     }
 
     #[test]
     fn normal_vector_on_a_cylinder() {
         let cyl = Cylinder::new();
-        let points = vec![
+        let points = [
             Tuple::point(1.0, 0.0, 0.0),
             Tuple::point(0.0, 5.0, -1.0),
             Tuple::point(0.0, -2.0, 1.0),
             Tuple::point(-1.0, 1.0, 0.0),
         ];
-        let normals = vec![
+        let normals = [
             Tuple::vector(1.0, 0.0, 0.0),
             Tuple::vector(0.0, 0.0, -1.0),
             Tuple::vector(0.0, 0.0, 1.0),
@@ -183,7 +186,7 @@ mod tests {
         let mut cyl = Object::new_cylinder();
         cyl.as_mut_cylinder().minimum = 1.0;
         cyl.as_mut_cylinder().maximum = 2.0;
-        let points = vec![
+        let points = [
             Tuple::point(0.0, 1.5, 0.0),
             Tuple::point(0.0, 3.0, -5.0),
             Tuple::point(0.0, 0.0, -5.0),
@@ -191,7 +194,7 @@ mod tests {
             Tuple::point(0.0, 1.0, -5.0),
             Tuple::point(0.0, 1.5, -2.0),
         ];
-        let directions = vec![
+        let directions = [
             Tuple::vector(0.1, 1.0, 0.0),
             Tuple::vector(0.0, 0.0, 1.0),
             Tuple::vector(0.0, 0.0, 1.0),
@@ -199,7 +202,7 @@ mod tests {
             Tuple::vector(0.0, 0.0, 1.0),
             Tuple::vector(0.0, 0.0, 1.0),
         ];
-        let counts = vec![0, 0, 0, 0, 0, 2];
+        let counts = [0, 0, 0, 0, 0, 2];
         for i in 0..points.len() {
             let r = Ray::new(points[i], directions[i].normalize());
             let mut xs = Vec::new();
@@ -211,7 +214,7 @@ mod tests {
     #[test]
     fn the_default_closed_value_for_a_cylinder() {
         let cyl = Cylinder::new();
-        assert_eq!(cyl.closed, false);
+        assert!(!cyl.closed);
     }
 
     #[test]
@@ -220,21 +223,21 @@ mod tests {
         cyl.as_mut_cylinder().minimum = 1.0;
         cyl.as_mut_cylinder().maximum = 2.0;
         cyl.as_mut_cylinder().closed = true;
-        let points = vec![
+        let points = [
             Tuple::point(0.0, 3.0, 0.0),
             Tuple::point(0.0, 3.0, -2.0),
             Tuple::point(0.0, 4.0, -2.0),
             Tuple::point(0.0, 0.0, -2.0),
             Tuple::point(0.0, -1.0, -2.0),
         ];
-        let directions = vec![
+        let directions = [
             Tuple::vector(0.0, -1.0, 0.0),
             Tuple::vector(0.0, -1.0, 2.0),
             Tuple::vector(0.0, -1.0, 1.0),
             Tuple::vector(0.0, 1.0, 2.0),
             Tuple::vector(0.0, 1.0, 1.0),
         ];
-        let counts = vec![2, 2, 2, 2, 2];
+        let counts = [2, 2, 2, 2, 2];
         for i in 0..points.len() {
             let r = Ray::new(points[i], directions[i].normalize());
             let mut xs = Vec::new();
@@ -249,7 +252,7 @@ mod tests {
         cyl.minimum = 1.0;
         cyl.maximum = 2.0;
         cyl.closed = true;
-        let points = vec![
+        let points = [
             Tuple::point(0.0, 1.0, 0.0),
             Tuple::point(0.5, 1.0, 0.0),
             Tuple::point(0.0, 1.0, 0.5),
@@ -257,7 +260,7 @@ mod tests {
             Tuple::point(0.5, 2.0, 0.0),
             Tuple::point(0.0, 2.0, 0.5),
         ];
-        let normals = vec![
+        let normals = [
             Tuple::vector(0.0, -1.0, 0.0),
             Tuple::vector(0.0, -1.0, 0.0),
             Tuple::vector(0.0, -1.0, 0.0),

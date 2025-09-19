@@ -15,11 +15,7 @@ impl Tuple {
         Tuple(x, y, z, 0.0)
     }
     pub fn random_vector(magnitude: Float) -> Tuple {
-        Tuple::vector(
-            rand(magnitude),
-            rand(magnitude),
-            rand(magnitude),
-        )
+        Tuple::vector(rand(magnitude), rand(magnitude), rand(magnitude))
     }
     pub fn x(&self) -> Float {
         self.0
@@ -309,11 +305,7 @@ mod tests {
     #[test]
     fn reflecting_a_vector_off_a_slanted_surface() {
         let v = Tuple::vector(0.0, -1.0, 0.0);
-        let n = Tuple::vector(
-            SQRT_2 / 2.0,
-            SQRT_2 / 2.0,
-            0.0,
-        );
+        let n = Tuple::vector(SQRT_2 / 2.0, SQRT_2 / 2.0, 0.0);
         let r = v.reflect(n);
         assert_eq!(r, Tuple::vector(1.0, 0.0, 0.0));
     }

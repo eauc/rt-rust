@@ -183,7 +183,7 @@ mod tests {
         let object = Object::new_sphere();
         let i = Intersection::new(4.0, &object);
         let comps = i.prepare_computations(&r, &vec![]);
-        assert_eq!(comps.inside, false);
+        assert!(!comps.inside);
     }
 
     #[test]
@@ -194,7 +194,7 @@ mod tests {
         let comps = i.prepare_computations(&r, &vec![]);
         assert_eq!(comps.point, Tuple::point(0.0, 0.0, 1.0));
         assert_eq!(comps.eyev, Tuple::vector(0.0, 0.0, -1.0));
-        assert_eq!(comps.inside, true);
+        assert!(comps.inside);
         assert_eq!(comps.normalv, Tuple::vector(0.0, 0.0, -1.0));
     }
 

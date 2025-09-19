@@ -9,10 +9,7 @@ pub struct GradientPattern {
 
 impl GradientPattern {
     pub fn new(a: Color, b: Color) -> GradientPattern {
-        GradientPattern {
-            a,
-            b,
-        }
+        GradientPattern { a, b }
     }
 
     pub fn color_at(&self, point: Tuple) -> Color {

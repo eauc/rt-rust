@@ -1,4 +1,4 @@
-use crate::colors::{Color};
+use crate::colors::Color;
 use crate::floats::Float;
 use crate::lights::point_lights;
 use crate::rays::Ray;
@@ -12,10 +12,7 @@ pub struct SphereLight {
 
 impl SphereLight {
     pub fn new(size: Float, samples: usize) -> SphereLight {
-        SphereLight {
-            size,
-            samples,
-        }
+        SphereLight { size, samples }
     }
 
     pub fn shadowed_intensity<T>(
@@ -30,8 +27,7 @@ impl SphereLight {
     {
         let mut n_shadowed = 0;
         for _ in 0..self.samples {
-            let light_position =
-                light_position + Tuple::random_vector(self.size).normalize();
+            let light_position = light_position + Tuple::random_vector(self.size).normalize();
             n_shadowed += if point_lights::is_shadowed(light_position, point, &hit_fn) {
                 0
             } else {

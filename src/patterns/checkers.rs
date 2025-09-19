@@ -9,10 +9,7 @@ pub struct CheckerPattern {
 
 impl CheckerPattern {
     pub fn new(a: Color, b: Color) -> CheckerPattern {
-        CheckerPattern {
-            a,
-            b,
-        }
+        CheckerPattern { a, b }
     }
 
     pub fn color_at(&self, point: Tuple) -> Color {

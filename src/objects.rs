@@ -3,7 +3,6 @@ use crate::intersections::Intersection;
 use crate::materials::Material;
 use crate::matrices::Matrix;
 use crate::rays::Ray;
-use crate::shapes::Shapes;
 use crate::shapes::cones::Cone;
 use crate::shapes::csg::{Csg, Operation};
 use crate::shapes::cubes::Cube;
@@ -13,6 +12,7 @@ use crate::shapes::planes::Plane;
 use crate::shapes::smooth_triangles::SmoothTriangle;
 use crate::shapes::spheres::Sphere;
 use crate::shapes::triangles::Triangle;
+use crate::shapes::Shapes;
 use crate::tuples::Tuple;
 use std::ptr;
 
@@ -212,7 +212,7 @@ impl Object {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::floats::{PI, SQRT_3};
+    use crate::floats::{PI, SQRT_2, SQRT_3};
     use crate::shapes::TestShape;
     use crate::transformations::{rotation_y, scaling, translation};
 
@@ -251,8 +251,8 @@ mod tests {
     fn computing_the_normal_on_a_translated_shape() {
         let o = new_test().with_transform(translation(0.0, 1.0, 0.0));
         let hit = Intersection::new(0.0, &o);
-        let n = o.normal_at(Tuple::point(0.0, 1.70711, -0.70711), &hit);
-        assert_eq!(n, Tuple::vector(0.0, 0.70711, -0.70711));
+        let n = o.normal_at(Tuple::point(0.0, 1.0 + SQRT_2 / 2.0, -SQRT_2 / 2.0), &hit);
+        assert_eq!(n, Tuple::vector(0.0, SQRT_2 / 2.0, -SQRT_2 / 2.0));
     }
 
     #[test]

@@ -1,5 +1,5 @@
 use crate::bounds::Bounds;
-use crate::floats::{EPSILON, Float, equals};
+use crate::floats::{equals, Float, EPSILON};
 use crate::intersections::Intersection;
 use crate::objects::Object;
 use crate::rays::Ray;
@@ -124,17 +124,17 @@ mod tests {
     #[test]
     fn intersecting_a_cone_with_a_ray() {
         let shape = Object::new_cone();
-        let origins = vec![
+        let origins = [
             Tuple::point(0.0, 0.0, -5.0),
             Tuple::point(0.0, 0.0, -5.0),
             Tuple::point(1.0, 1.0, -5.0),
         ];
-        let directions = vec![
+        let directions = [
             Tuple::vector(0.0, 0.0, 1.0),
             Tuple::vector(1.0, 1.0, 1.0),
             Tuple::vector(-0.5, -1.0, 1.0),
         ];
-        let results = vec![
+        let results = [
             vec![5.0, 5.0],
             vec![8.6602545, 8.6602545],
             vec![4.5500546, 49.449955],
@@ -168,17 +168,17 @@ mod tests {
         shape.as_mut_cone().minimum = -0.5;
         shape.as_mut_cone().maximum = 0.5;
         shape.as_mut_cone().closed = true;
-        let origins = vec![
+        let origins = [
             Tuple::point(0.0, 0.0, -5.0),
             Tuple::point(0.0, 0.0, -0.25),
             Tuple::point(0.0, 0.0, -0.25),
         ];
-        let directions = vec![
+        let directions = [
             Tuple::vector(0.0, 1.0, 0.0),
             Tuple::vector(0.0, 1.0, 1.0),
             Tuple::vector(0.0, 1.0, 0.0),
         ];
-        let counts = vec![0, 2, 4];
+        let counts = [0, 2, 4];
         for i in 0..origins.len() {
             let r = Ray::new(origins[i], directions[i].normalize());
             let mut xs = Vec::new();
@@ -190,12 +190,12 @@ mod tests {
     #[test]
     fn computing_the_normal_vector_on_a_cone() {
         let shape = Cone::new();
-        let points = vec![
+        let points = [
             Tuple::point(0.0, 0.0, 0.0),
             Tuple::point(1.0, 1.0, 1.0),
             Tuple::point(-1.0, -1.0, 0.0),
         ];
-        let normals = vec![
+        let normals = [
             Tuple::vector(0.0, 0.0, 0.0),
             Tuple::vector(1.0, -SQRT_2, 1.0),
             Tuple::vector(-1.0, 1.0, 0.0),

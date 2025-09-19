@@ -47,14 +47,7 @@ pub fn rotation_z(r: Float) -> Matrix<4> {
     ])
 }
 
-pub fn shearing(
-    xy: Float,
-    xz: Float,
-    yx: Float,
-    yz: Float,
-    zx: Float,
-    zy: Float,
-) -> Matrix<4> {
+pub fn shearing(xy: Float, xz: Float, yx: Float, yz: Float, zx: Float, zy: Float) -> Matrix<4> {
     Matrix::new([
         [1.0, xy, xz, 0.0],
         [yx, 1.0, yz, 0.0],

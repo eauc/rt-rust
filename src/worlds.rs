@@ -1,5 +1,5 @@
-use crate::colors::{BLACK, Color, WHITE};
-use crate::intersections::{self, Intersection, IntersectionComputations, schlick};
+use crate::colors::{Color, BLACK, WHITE};
+use crate::intersections::{self, schlick, Intersection, IntersectionComputations};
 use crate::lights::Light;
 use crate::objects::Object;
 use crate::rays::Ray;
@@ -71,7 +71,12 @@ impl World {
         color * hit.object.material.transparency
     }
 
-    fn shade_hit(&self, hit: &Intersection, comps: &IntersectionComputations, depth: usize) -> Color {
+    fn shade_hit(
+        &self,
+        hit: &Intersection,
+        comps: &IntersectionComputations,
+        depth: usize,
+    ) -> Color {
         let shadowed_lights = self
             .lights
             .iter()
@@ -122,7 +127,7 @@ impl Default for World {
 pub mod tests {
     use super::*;
     use crate::colors::BLACK;
-    use crate::floats::{Float, SQRT_2};
+    use crate::floats::SQRT_2;
     use crate::patterns::Pattern;
     use crate::transformations::{scaling, translation};
     use crate::tuples::Tuple;
@@ -279,7 +284,7 @@ pub mod tests {
         let i = Intersection::new(SQRT_2, &w.objects[2]);
         let comps = i.prepare_computations(&r, &vec![]);
         let color = w.shade_hit(&i, &comps, 1);
-        assert_eq!(color, Color::new(0.8767573, 0.924340374, 0.8291743));
+        assert_eq!(color, Color::new(0.8767573, 0.924_340_37, 0.8291743));
     }
 
     #[test]
@@ -367,7 +372,7 @@ pub mod tests {
         ];
         let comps = xs[2].prepare_computations(&r, &xs);
         let c = w.refracted_color(&xs[2], &comps, 5);
-        assert_eq!(c, Color::new(0.0, 0.99887455, 0.0472189175));
+        assert_eq!(c, Color::new(0.0, 0.99887455, 0.047_218_92));
     }
 
     #[test]
